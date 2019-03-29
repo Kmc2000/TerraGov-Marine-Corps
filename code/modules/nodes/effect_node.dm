@@ -2,6 +2,7 @@
 
 /obj/effect/AINode //A effect that has a ai_node datum in it, used by AIs to pathfind over long distances as well as knowing what's happening at it
 	name = "AI Node"
+	icon = 'icons/mob/screen1.dmi'
 	icon_state = "x4" //Pure white 'X'
 	var/datum/ai_node/datumnode = new/datum/ai_node() //Stores things about the AI node
 	var/list/mob/living/detectedmobs = list() //All hostile mobs that were reported here
@@ -28,6 +29,5 @@
 
 /obj/effect/AINode/debug/Initialize()
 	..()
-	alpha = 120
-	invisibility = 0
+	alpha = 127
 	color = "#ffffff" //Color coding yo; white is 'unkonwn', green is 'safe' and red is 'danger'

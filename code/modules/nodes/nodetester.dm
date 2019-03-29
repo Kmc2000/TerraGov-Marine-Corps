@@ -13,13 +13,15 @@
 			forceMove(current_node.loc)
 			break
 	GetRandomDestination()
-	next_node = current_node.GetNodeInDirInAdj(pick(DiagonalToCardinal(get_dir(src, destination_node))))
+	var/nextnode = current_node.GetNodeInDirInAdj(pick(DiagonalToCardinal(get_dir(src, destination_node))))
+	if(nextnode)
+		next_node = nextnode
 	ConsiderMovement()
 
 /mob/living/carbon/Xenomorph/Drone/node/proc/ConsiderMovement()
 	if(!next_node || next_node == current_node)
 		next_node = current_node.GetNodeInDirInAdj(pick(DiagonalToCardinal(get_dir(src, destination_node))))
-	forceMove(next_node)
+	forceMove(next_node.loc)
 	current_node = next_node
 	if(current_node == destination_node)
 		destination_node.color = initial(color)
