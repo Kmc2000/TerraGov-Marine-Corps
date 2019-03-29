@@ -9,12 +9,12 @@
 
 /obj/effect/AINode/Initialize() //Add ourselve to the global list of nodes
 	..()
-	GLOB.allnodes += src
 	datumnode.parentnode = src
+	GLOB.allnodes += src
 
 /obj/effect/AINode/proc/MakeAdjacents()
 	for(var/obj/effect/AINode/node in GLOB.allnodes)
-		if((node != src) && (get_dir(src, node) in GLOB.cardinals) && (get_dist(src, node) < 14))
+		if((node != src) && (get_dir(src, node) in GLOB.cardinals) && (get_dist(src, node) < 3))
 			var/IsClearPath = TRUE //If a getline() to the node is nondense at all
 			var/list/turf/turfs = getline(src, node)
 			for(var/turf/T in turfs)

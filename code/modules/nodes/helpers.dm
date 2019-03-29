@@ -2,7 +2,7 @@
 
 //Returns a node that is in the direction of this node; must be in the src's adjacent node list
 /obj/effect/AINode/proc/GetNodeInDirInAdj(dir)
-	for(var/obj/effect/AINode/node in ai_node.adjacent_nodes)
+	for(var/obj/effect/AINode/node in datumnode.adjacent_nodes)
 		if(get_dir(src, node) == dir)
 			return node
 	return null
