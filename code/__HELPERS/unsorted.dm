@@ -270,7 +270,7 @@ Turf and target are seperate in case you want to teleport some distance from a t
 //This will update a mob's name, real_name, mind.name, data_core records, pda and id
 //Calling this proc without an oldname will only update the mob and skip updating the pda, id and records ~Carn
 /mob/proc/fully_replace_character_name(oldname, newname)
-	if(!newname)	
+	if(!newname)
 		return FALSE
 
 	log_played_names(ckey, newname)
@@ -1533,3 +1533,26 @@ proc/pick_closest_path(value, list/matches = get_fancy_list_of_atom_types())
 	else if(powerused < 1000000000) //Less than a GW
 		return "[round((powerused * 0.000001),0.001)] MW"
 	return "[round((powerused * 0.000000001),0.0001)] GW"
+
+//If the input dir is diagonal, returns TRUE, otherwise FALSE
+/proc/IsDiagonal(direct)
+	if(direct in GLOB.cardinals)
+		return FALSE
+	return TRUE
+
+//Converts input direction to a list of either two same directions if the input is cardinal
+//Otherwise will return the two directions that make up the diagonal
+/proc/DiagonalToCardinal(direct)
+	if(direct in GLOB.cardinals)
+		return list(direct, direct)
+	return list(NSCOMPONENT(direct), EWCOMPONENT(direct))
+
+	switch(direct)
+		if(NORTHEAST)
+			return shuffle(list(NORTH, EAST))
+		if(NORTHWEST)
+			return shuffle(list(NORTH, WEST))
+		if(SOUTHEAST)
+			return shuffle(list(SOUTH, EAST))
+		if(SOUTHWEST)
+			return shuffle(list(SOUTH, WEST))
