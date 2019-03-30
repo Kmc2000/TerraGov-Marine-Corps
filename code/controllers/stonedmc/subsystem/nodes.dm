@@ -4,7 +4,10 @@ SUBSYSTEM_DEF(nodes)
 	flags = SS_NO_FIRE
 
 /datum/controller/subsystem/nodes/Initialize()
+	InitAllAdjacent()
 
+//Call this to manually make adjacencies
+/datum/controller/subsystem/nodes/proc/InitAllAdjacent()
 	for(var/obj/effect/AINode/nodes in GLOB.allnodes)
 		nodes.MakeAdjacents()
 	return ..()

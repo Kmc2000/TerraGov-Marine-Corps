@@ -14,6 +14,7 @@
 	GLOB.allnodes += src
 
 /obj/effect/AINode/proc/MakeAdjacents()
+	datumnode.adjacent_nodes = list()
 	for(var/obj/effect/AINode/node in GLOB.allnodes)
 		if((node != src) && (get_dir(src, node) in GLOB.cardinals) && (get_dist(src, node) < 3))
 			var/IsClearPath = TRUE //If a getline() to the node is nondense at all
