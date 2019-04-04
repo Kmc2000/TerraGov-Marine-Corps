@@ -156,7 +156,7 @@
 			icon_state = M.pulse ? "table2-active" : "table2-idle"
 			return 1
 	victim = null
-	STOP_PROCESSING(SSmachines, src)
+	stop_processing()
 	icon_state = "table2-idle"
 	return 0
 
@@ -175,7 +175,7 @@
 	if(ishuman(C))
 		var/mob/living/carbon/human/H = C
 		victim = H
-		START_PROCESSING(SSmachines, src)
+		start_processing()
 		icon_state = H.pulse ? "table2-active" : "table2-idle"
 	else
 		icon_state = "table2-idle"
@@ -185,7 +185,7 @@
 	set category = "Object"
 	set src in oview(1)
 
-	if(usr.stat || !ishuman(usr) || usr.is_mob_restrained() || !check_table(usr))
+	if(usr.stat || !ishuman(usr) || usr.restrained() || !check_table(usr))
 		return
 
 	take_victim(usr,usr)

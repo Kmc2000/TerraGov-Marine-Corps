@@ -30,7 +30,7 @@
 					/obj/item/ammo_magazine/sentry,
 					)
 
-/obj/item/storage/box/sentry/New()
+/obj/item/storage/box/sentry/Initialize()
 	. = ..()
 	new /obj/item/device/turret_top(src)
 	new /obj/item/device/turret_tripod(src)
@@ -306,13 +306,10 @@
 		target = null
 	alert_list = list()
 	SetLuminosity(0)
-	STOP_PROCESSING(SSmachines, src)
+	stop_processing()
 	. = ..()
 
 /obj/machinery/marine_turret/attack_hand(mob/user as mob)
-	if(isyautja(user))
-		to_chat(user, "<span class='warning'>You punch [src] but nothing happens.</span>")
-		return
 	src.add_fingerprint(user)
 
 	if(!cell || cell.charge <= 0)
@@ -387,7 +384,7 @@
 	if(!istype(user))
 		return
 
-	if(get_dist(loc, user.loc) > 1 || user.is_mob_incapacitated())
+	if(get_dist(loc, user.loc) > 1 || user.incapacitated())
 		return
 
 	user.set_interaction(src)
@@ -520,7 +517,7 @@
 		manual_override = FALSE
 
 /obj/machinery/marine_turret/check_eye(mob/user)
-	if(user.is_mob_incapacitated() || get_dist(user, src) > 1 || is_blind(user) || user.lying || !user.client)
+	if(user.incapacitated() || get_dist(user, src) > 1 || is_blind(user) || user.lying || !user.client)
 		user.unset_interaction()
 
 /obj/machinery/marine_turret/attackby(var/obj/item/O as obj, mob/user as mob)
@@ -709,7 +706,7 @@
 		on = FALSE
 		density = FALSE
 		icon_state = "sentry_fallen"
-		STOP_PROCESSING(SSmachines, src)
+		stop_processing()
 		return
 	else
 		density = initial(density)
@@ -722,7 +719,7 @@
 
 	if(!cell || cell.charge <= 0)
 		on = FALSE
-		STOP_PROCESSING(SSmachines, src)
+		stop_processing()
 		overlays += battery_black
 		return
 
@@ -737,11 +734,11 @@
 			overlays += battery_red
 
 	if(on)
-		START_PROCESSING(SSmachines, src)
+		start_processing()
 		overlays += active
 
 	else
-		STOP_PROCESSING(SSmachines, src)
+		stop_processing()
 
 /obj/machinery/marine_turret/proc/update_health(var/damage) //Negative damage restores health.
 
@@ -1123,10 +1120,6 @@
 
 
 /obj/machinery/marine_turret/premade/dumb/attack_hand(mob/user as mob)
-
-	if(isyautja(user))
-		to_chat(user, "<span class='warning'>You punch [src] but nothing happens.</span>")
-		return
 	src.add_fingerprint(user)
 
 	if(!cell || cell.charge <= 0)
@@ -1237,7 +1230,7 @@
 	ammo = /datum/ammo/bullet/turret/mini //Similar to M39 AP rounds.
 	magazine_type = /obj/item/ammo_magazine/minisentry
 
-/obj/item/storage/box/sentry/New()
+/obj/item/storage/box/sentry/Initialize(mapload, ...)
 	. = ..()
 	update_icon()
 
@@ -1275,7 +1268,7 @@
 		on = FALSE
 		density = FALSE
 		icon_state = "minisentry_fallen"
-		STOP_PROCESSING(SSmachines, src)
+		stop_processing()
 		return
 	else
 		icon_state = "minisentry_off"
@@ -1283,18 +1276,18 @@
 
 	if(!cell)
 		on = FALSE
-		STOP_PROCESSING(SSmachines, src)
+		stop_processing()
 		icon_state = "minisentry_nobat"
 		return
 
 	if(cell.charge <= 0)
 		on = FALSE
-		STOP_PROCESSING(SSmachines, src)
+		stop_processing()
 		icon_state = "minisentry_nobat"
 		return
 
 	if(on)
-		START_PROCESSING(SSmachines, src)
+		start_processing()
 		if(!rounds)
 			icon_state = "minisentry_noammo"
 		else
@@ -1302,7 +1295,7 @@
 
 	else
 		icon_state = "minisentry_off"
-		STOP_PROCESSING(SSmachines, src)
+		stop_processing()
 
 
 /obj/item/device/marine_turret/mini
@@ -1356,18 +1349,18 @@
 	icon_state = "sentry_case"
 	w_class = 5
 	storage_slots = 4
-	can_hold = list(/obj/item/device/marine_turret/mini, //gun itself
-					/obj/item/tool/wrench, //wrench to hold it down into the ground
-					/obj/item/tool/screwdriver, //screw the gun onto the post.
-					/obj/item/ammo_magazine/minisentry)
+	can_hold = list(
+		/obj/item/device/marine_turret/mini, //gun itself
+		/obj/item/tool/wrench, //wrench to hold it down into the ground
+		/obj/item/tool/screwdriver, //screw the gun onto the post.
+		/obj/item/ammo_magazine/minisentry)
 
-/obj/item/storage/box/minisentry/New()
+/obj/item/storage/box/minisentry/Initialize(mapload, ...)
 	. = ..()
-	spawn(1)
-		new /obj/item/device/marine_turret/mini(src) //gun itself
-		new /obj/item/tool/wrench(src) //wrench to hold it down into the ground
-		new /obj/item/tool/screwdriver(src) //screw the gun onto the post.
-		new /obj/item/ammo_magazine/minisentry(src)
+	new /obj/item/device/marine_turret/mini(src) //gun itself
+	new /obj/item/tool/wrench(src) //wrench to hold it down into the ground
+	new /obj/item/tool/screwdriver(src) //screw the gun onto the post.
+	new /obj/item/ammo_magazine/minisentry(src)
 
 /obj/machinery/marine_turret/proc/activate_turret()
 	if(!anchored)

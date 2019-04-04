@@ -6,7 +6,7 @@
 	icon_state = "cell-off"
 	density = TRUE
 	//max_integrity = 350
-	//armor = list("melee" = 0, "bullet" = 0, "laser" = 0, "energy" = 100, "bomb" = 0, "bio" = 100, "rad" = 100, "fire" = 30, "acid" = 30)
+	armor = list("melee" = 0, "bullet" = 0, "laser" = 0, "energy" = 100, "bomb" = 0, "bio" = 100, "rad" = 100, "fire" = 30, "acid" = 30)
 	layer = ABOVE_WINDOW_LAYER
 	//state_open = FALSE
 	//circuit = /obj/item/circuitboard/machine/cryo_tube
@@ -169,7 +169,7 @@
 
 /obj/machinery/atmospherics/components/unary/cryo_cell/proc/turn_off()
 	on = FALSE
-	STOP_PROCESSING(SSmachines, src)
+	stop_processing()
 	update_icon()
 
 /obj/machinery/atmospherics/components/unary/cryo_cell/process()
@@ -181,7 +181,7 @@
 
 	if(!on)
 		updateUsrDialog()
-		STOP_PROCESSING(SSmachines, src)
+		stop_processing()
 		return
 
 	if(occupant)
@@ -390,7 +390,7 @@
 	if(!ishuman(occupant))
 		return
 	var/mob/living/carbon/human/H = occupant
-	for(var/datum/data/record/R in data_core.medical)
+	for(var/datum/data/record/R in GLOB.datacore.medical)
 		if (!R.fields["name"] == H.real_name)
 			continue
 		if(R.fields["last_scan_time"] && R.fields["last_scan_result"])
@@ -467,7 +467,7 @@
 		to_chat(usr, "<span class='warning'>The cryo cell is not functioning.</span>")
 		return
 	on = TRUE
-	START_PROCESSING(SSmachines, src)
+	start_processing()
 	update_icon()
 
 /obj/machinery/atmospherics/components/unary/cryo_cell/Topic(href, href_list)

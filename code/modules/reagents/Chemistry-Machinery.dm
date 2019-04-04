@@ -42,10 +42,11 @@
 	else
 		recharged -= 1
 
-/obj/machinery/chem_dispenser/Initialize()
-	. = ..()
+/obj/machinery/chem_dispenser/New()
+	..()
 	recharge()
 	dispensable_reagents = sortList(dispensable_reagents)
+	start_processing()
 
 
 /obj/machinery/chem_dispenser/ex_act(severity)
@@ -76,7 +77,7 @@
 /obj/machinery/chem_dispenser/ui_interact(mob/user, ui_key = "main",var/datum/nanoui/ui = null, var/force_open = 0)
 	if(machine_stat & (BROKEN|NOPOWER))
 		return
-	if(user.stat || user.is_mob_restrained())
+	if(user.stat || user.restrained())
 		return
 
 	// this is the data which will be sent to the ui
@@ -310,7 +311,7 @@
 	if(!ishuman(usr))
 		return
 	var/mob/living/carbon/human/user = usr
-	if(user.stat || user.is_mob_restrained())
+	if(user.stat || user.restrained())
 		return
 	if(!in_range(src, user))
 		return
@@ -656,7 +657,7 @@
 	if(!ishuman(usr))
 		return
 	var/mob/living/carbon/human/user = usr
-	if(user.stat || user.is_mob_restrained())
+	if(user.stat || user.restrained())
 		return
 	if(!in_range(src, user))
 		return
@@ -744,7 +745,7 @@
 		var/new_name = stripped_input(user, "Name the Disease", "New Name", "", MAX_NAME_LEN)
 		if(machine_stat & (NOPOWER|BROKEN))
 			return
-		if(user.stat || user.is_mob_restrained())
+		if(user.stat || user.restrained())
 			return
 		if(!in_range(src, user))
 			return

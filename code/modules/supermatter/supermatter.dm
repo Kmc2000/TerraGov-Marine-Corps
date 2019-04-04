@@ -96,16 +96,17 @@
 		explosion_power = 3 //3,6,9,12? Or is that too small?
 
 
-/obj/machinery/power/supermatter/Initialize()
+/obj/machinery/power/supermatter/New()
 	. = ..()
-	radio = new(src)
+	radio = new (src)
+	start_processing()
 
 
 /obj/machinery/power/supermatter/Destroy()
 	qdel(radio)
 	radio = null
 	SetLuminosity(0)
-	return ..()
+	. = ..()
 
 /obj/machinery/power/supermatter/proc/explode()
 	anchored = 1
@@ -324,9 +325,7 @@
 
 /obj/machinery/power/supermatter/proc/supermatter_pull()
 
-	//following is adapted from singulo code
-	if(defer_powernet_rebuild != 2)
-		defer_powernet_rebuild = 1
+	defer_powernet_rebuild = TRUE
 	// Let's just make this one loop.
 	for(var/atom/X in orange(pull_radius,src))
 		// Movable atoms only
@@ -353,6 +352,5 @@
 				step_towards(H,src) //step twice
 				step_towards(H,src)
 
-	if(defer_powernet_rebuild != 2)
-		defer_powernet_rebuild = 0
+	defer_powernet_rebuild = FALSE
 	return

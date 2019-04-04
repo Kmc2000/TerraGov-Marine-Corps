@@ -17,8 +17,9 @@
 
 /obj/machinery/power/generator/Initialize()
 	. = ..()
-	reconnect()
 
+	reconnect()
+	start_processing()
 
 //generators connect in dir and reverse_dir(dir) directions
 //mnemonic to determine circulator/generator directions: the cirulators orbit clockwise around the generator
@@ -153,7 +154,7 @@
 	set name = "Rotate Generator (Clockwise)"
 	set src in view(1)
 
-	if (usr.stat || usr.is_mob_restrained()  || anchored)
+	if (usr.stat || usr.restrained()  || anchored)
 		return
 
 	setDir(turn(src.dir, 90))
@@ -163,7 +164,7 @@
 	set name = "Rotate Generator (Counterclockwise)"
 	set src in view(1)
 
-	if (usr.stat || usr.is_mob_restrained()  || anchored)
+	if (usr.stat || usr.restrained()  || anchored)
 		return
 
 	setDir(turn(src.dir, -90))

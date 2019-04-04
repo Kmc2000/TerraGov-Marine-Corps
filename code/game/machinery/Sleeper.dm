@@ -125,7 +125,7 @@
 		return FALSE
 	if(!usr)
 		return FALSE
-	if(usr.is_mob_incapacitated() || !usr.IsAdvancedToolUser())
+	if(usr.incapacitated() || !usr.IsAdvancedToolUser())
 		return FALSE
 	var/mob/living/carbon/human/user = usr
 	if(get_dist(src, user) > 1)
@@ -195,7 +195,7 @@
 	occupant?.in_stasis = FALSE //clean up; end stasis; remove from processing
 	occupant = null
 	STOP_PROCESSING(SSobj, src)
-	STOP_PROCESSING(SSmachines, src)
+	stop_processing()
 	return ..()
 
 /obj/machinery/sleeper/examine(mob/living/user)
@@ -213,7 +213,7 @@
 		to_chat(user, "<span class='notice'>It contains: [occupant].[feedback]</span>")
 		return
 	var/mob/living/carbon/human/H = occupant
-	for(var/datum/data/record/R in data_core.medical)
+	for(var/datum/data/record/R in GLOB.datacore.medical)
 		if (!R.fields["name"] == H.real_name)
 			continue
 		if(!(R.fields["last_scan_time"]))
@@ -233,7 +233,7 @@
 	if(!ishuman(occupant))
 		return
 	var/mob/living/carbon/human/H = occupant
-	for(var/datum/data/record/R in data_core.medical)
+	for(var/datum/data/record/R in GLOB.datacore.medical)
 		if (!R.fields["name"] == H.real_name)
 			continue
 		if(R.fields["last_scan_time"] && R.fields["last_scan_result"])
@@ -255,7 +255,7 @@
 			occupant.in_stasis = null
 		stasis = FALSE
 		filtering = FALSE
-		STOP_PROCESSING(SSmachines, src) //Shut down; stasis off, filtering off, stop processing.
+		stop_processing() //Shut down; stasis off, filtering off, stop processing.
 		return
 
 	//Life support
@@ -307,8 +307,8 @@
 		visible_message("[user] puts [M.name] into the sleeper.", 3)
 		update_use_power(2)
 		occupant = M
-		START_PROCESSING(SSmachines, src)
-		START_PROCESSING(SSmachines, connected)
+		start_processing()
+		connected.start_processing()
 		icon_state = "sleeper_1"
 		if(orient == "RIGHT")
 			icon_state = "sleeper_1-r"
@@ -372,8 +372,8 @@
 	occupant.in_stasis = null //disable stasis
 	stasis = FALSE
 	occupant = null
-	STOP_PROCESSING(SSmachines, src)
-	STOP_PROCESSING(SSmachines, connected)
+	stop_processing()
+	connected.stop_processing()
 	update_use_power(1)
 	if(orient == "RIGHT")
 		icon_state = "sleeper_0-r"
@@ -468,8 +468,8 @@
 	visible_message("[user] climbs into the sleeper.", 3)
 	update_use_power(2)
 	occupant = usr
-	START_PROCESSING(SSmachines, src)
-	START_PROCESSING(SSmachines, connected)
+	start_processing()
+	connected.start_processing()
 	icon_state = "sleeper_1"
 	if(orient == "RIGHT")
 		icon_state = "sleeper_1-r"

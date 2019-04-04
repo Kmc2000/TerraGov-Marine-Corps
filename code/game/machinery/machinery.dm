@@ -115,7 +115,7 @@ Class Procs:
 	var/manual = 0
 	var/global/gl_uid = 1
 	layer = OBJ_LAYER
-	var/speed_process = FALSE // Process as fast as possible?
+	var/machine_processing = 0 // whether the machine is busy and requires process() calls in scheduler.
 
 	var/wrenchable = FALSE
 	var/destructible = TRUE
@@ -140,26 +140,13 @@ Class Procs:
 	if(A)
 		A.area_machines += src
 
-	if(!speed_process)
-		START_PROCESSING(SSmachines, src)
-	else
-		START_PROCESSING(SSfastprocess, src)
-
-	power_change()
-
-
 /obj/machinery/Destroy()
 	GLOB.machines -= src
+	processing_machines -= src
 	var/area/A = get_area(src)
 	if(A)
 		A.area_machines -= src
-
-	if(!speed_process)
-		STOP_PROCESSING(SSmachines, src)
-	else
-		STOP_PROCESSING(SSfastprocess, src)
-
-	return ..()
+	. = ..()
 
 /obj/machinery/proc/dropContents(list/subset = null)
 	var/turf/T = get_turf(src)
@@ -181,7 +168,15 @@ Class Procs:
 /obj/machinery/proc/on_construction()
 	return
 
-	. = ..()
+/obj/machinery/proc/start_processing()
+	if(!machine_processing)
+		machine_processing = TRUE
+		processing_machines += src
+
+/obj/machinery/proc/stop_processing()
+	if(machine_processing)
+		machine_processing = FALSE
+		processing_machines -= src
 
 /obj/machinery/process()//If you dont use process or power why are you here
 	return PROCESS_KILL
@@ -224,7 +219,7 @@ Class Procs:
 	if(A && A.master)
 		A.master.powerupdate = 1
 
-/obj/machinery/power_change()
+/obj/machinery/proc/power_change()
 	if(!powered(power_channel) && (machine_current_charge <= 0))
 		machine_stat |= NOPOWER
 	else
@@ -267,7 +262,7 @@ Class Procs:
 	..()
 	if(inoperable())
 		return 1
-	if(usr.is_mob_restrained() || usr.lying || usr.stat)
+	if(usr.restrained() || usr.lying || usr.stat)
 		return 1
 	if (!ishuman(usr) && !ismonkey(usr) && !issilicon(usr) && !isxeno(usr))
 		to_chat(usr, "<span class='warning'>You don't have the dexterity to do this!</span>")
@@ -384,7 +379,7 @@ Class Procs:
 
 obj/machinery/proc/med_scan(mob/living/carbon/human/H, dat, var/list/known_implants)
 	var/datum/data/record/N = null
-	for(var/datum/data/record/R in data_core.medical)
+	for(var/datum/data/record/R in GLOB.datacore.medical)
 		if (R.fields["name"] == H.real_name)
 			N = R
 	if(isnull(N))

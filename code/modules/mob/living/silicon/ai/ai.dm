@@ -189,14 +189,15 @@ var/list/ai_verbs_default = list(
 	var/mob/living/silicon/ai/powered_ai = null
 	invisibility = 100
 
-/obj/machinery/ai_powersupply/Initialize(mob/living/silicon/ai/ai)
-	. = ..()
+/obj/machinery/ai_powersupply/New(var/mob/living/silicon/ai/ai=null)
 	powered_ai = ai
 	if(isnull(powered_ai))
 		qdel(src)
 		return
+	loc = powered_ai.loc
 	use_power(1) // Just incase we need to wake up the power system.
-
+	start_processing()
+	..()
 
 /obj/machinery/ai_powersupply/process()
 	if(!powered_ai || powered_ai.stat & DEAD)
@@ -307,7 +308,7 @@ var/list/ai_verbs_default = list(
 		return
 	user.reset_view(camera)
 
-/mob/living/silicon/ai/is_mob_restrained()
+/mob/living/silicon/ai/restrained()
 	return 0
 
 /mob/living/silicon/ai/emp_act(severity)
@@ -519,7 +520,7 @@ var/list/ai_verbs_default = list(
 
 		var/personnel_list[] = list()
 
-		for(var/datum/data/record/t in data_core.locked)//Look in data core locked.
+		for(var/datum/data/record/t in GLOB.datacore.general)//Look in data core locked.
 			personnel_list["[t.fields["name"]]: [t.fields["rank"]]"] = t.fields["image"]//Pull names, rank, and image.
 
 		if(personnel_list.len)
