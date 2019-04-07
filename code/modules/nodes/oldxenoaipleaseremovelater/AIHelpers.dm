@@ -60,12 +60,12 @@ It will also check for density as well as IFF built into the projectiles, don't 
 		if(EAST)
 			somedirs = list(NORTH, SOUTH)
 	return(somedirs)
-
+/*
 /proc/IsDiagonal(d) //For seeing if a direction is diagonal
 	if(d == 1 || d == 2 || d == 4 || d == 8) //Pretty horrible, could be definitely better
 		return 0 //It's cardinal
 	return 1 //It's diagonal
-
+*/
 /proc/DirectionToCardinal(d, index) //Sanitizes the input by converting it from a diagonal to cardinal if it's a diagonal, index is if you want first or second result
 	var/list/possibledir = list(d, d)
 	if(!(IsDiagonal(d)))

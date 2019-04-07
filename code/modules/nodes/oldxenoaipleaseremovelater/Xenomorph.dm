@@ -39,9 +39,9 @@ var/global/list/AIXenosWithoutSquad = list() //List of all AI xenos without squa
 */
 
 /mob/living/carbon/Xenomorph/AI/update_progression()
-	if(upgrade != -1 && upgrade != 3) //upgrade possible
+	if(upgrade_possible() && upgrade != -1 && upgrade != 3) //upgrade possible
 		if(upgrade_stored >= xeno_caste.upgrade_threshold)
-			if(health == maxHealth && !is_mob_incapacitated() && !handcuffed && !legcuffed)
+			if(health == maxHealth && !incapacitated() && !handcuffed && !legcuffed)
 				upgrade_xeno(upgrade+1)
 			else
 				upgrade_stored = min(upgrade_stored + 1, xeno_caste.upgrade_threshold)
@@ -49,7 +49,7 @@ var/global/list/AIXenosWithoutSquad = list() //List of all AI xenos without squa
 /mob/living/carbon/Xenomorph/AI/update_evolving()
 	if(src)
 		evolution_stored += 1
-		if(evolution_stored >= xeno_caste.evolution_threshold && xeno_caste.caste_name != "Queen" && xeno_caste.tier != 3)
+		if(evolution_stored >= xeno_caste.evolution_threshold && xeno_caste.caste_name != "Queen" && CASTE_EVOLUTION_ALLOWED)
 			DoEvolve()
 			evolution_stored = 0
 
@@ -64,7 +64,7 @@ var/global/list/AIXenosWithoutSquad = list() //List of all AI xenos without squa
 	//	if(rangetomaintain != initial(rangetomaintain)) //More than fifty percent health but modified rangetomaintain, set to normal
 	//		rangetomaintain = initial(rangetomaintain)
 
-	if(get_dist(src, Proj.firer))
+	if(get_dist(src, Proj.firer) < 14)
 		SetTarget(Proj.firer)
 
 
@@ -306,18 +306,17 @@ var/global/list/AIXenosWithoutSquad = list() //List of all AI xenos without squa
 	caste_base_type = /mob/living/carbon/Xenomorph/Drone
 	name = "Drone"
 	desc = "An Alien Drone"
-	icon = 'icons/Xeno/1x1_Xenos.dmi'
+	icon = 'icons/Xeno/48x48_Xenos.dmi'
 	icon_state = "Drone Walking"
 	health = 120
 	maxHealth = 120
 	plasma_stored = 350
-	tier = 1
-	upgrade = 0
+	tier = XENO_TIER_ONE
+	upgrade = XENO_UPGRADE_ZERO
 	speed = -0.8
-	pixel_x = 0
-	old_x = 0
+	pixel_x = -12
+	old_x = -12
 	pull_speed = -2
-	wound_type = "alien" //used to match appropriate wound overlays
 
 /mob/living/carbon/Xenomorph/AI/Drone/ConsiderAbilities()
 	var/hasweeds = 0
@@ -333,13 +332,13 @@ var/global/list/AIXenosWithoutSquad = list() //List of all AI xenos without squa
 	current_aura = pick("frenzy", "warding", "recovery")
 
 /mob/living/carbon/Xenomorph/AI/Drone/mature
-	upgrade = 1
+	upgrade = XENO_UPGRADE_ONE
 
 /mob/living/carbon/Xenomorph/AI/Drone/elder
-	upgrade = 2
+	upgrade = XENO_UPGRADE_TWO
 
 /mob/living/carbon/Xenomorph/AI/Drone/ancient
-	upgrade = 3
+	upgrade = XENO_UPGRADE_THREE
 
 /mob/living/carbon/Xenomorph/AI/Runner
 	caste_base_type = /mob/living/carbon/Xenomorph/Runner
@@ -369,13 +368,13 @@ var/global/list/AIXenosWithoutSquad = list() //List of all AI xenos without squa
 			Pounce(target_mob)
 
 /mob/living/carbon/Xenomorph/AI/Runner/mature
-	upgrade = 1
+	upgrade = XENO_UPGRADE_ONE
 
 /mob/living/carbon/Xenomorph/AI/Runner/elder
-	upgrade = 2
+	upgrade = XENO_UPGRADE_TWO
 
 /mob/living/carbon/Xenomorph/AI/Runner/ancient
-	upgrade = 3
+	upgrade = XENO_UPGRADE_THREE
 
 /mob/living/carbon/Xenomorph/AI/Queen
 	caste_base_type = /mob/living/carbon/Xenomorph/Queen
@@ -423,13 +422,13 @@ var/global/list/AIXenosWithoutSquad = list() //List of all AI xenos without squa
 					queen_screech()
 
 /mob/living/carbon/Xenomorph/AI/Queen/mature
-	upgrade = 1
+	upgrade = XENO_UPGRADE_ONE
 
 /mob/living/carbon/Xenomorph/AI/Queen/elder
-	upgrade = 2
+	upgrade = XENO_UPGRADE_TWO
 
 /mob/living/carbon/Xenomorph/AI/Queen/ancient
-	upgrade = 3
+	upgrade = XENO_UPGRADE_THREE
 
 /mob/living/carbon/Xenomorph/AI/Queen/ovi //It's like regular queen but now ovipositers
 	var/larvacooldown = 600 //One minute per larva
@@ -533,13 +532,13 @@ var/global/list/AIXenosWithoutSquad = list() //List of all AI xenos without squa
 		cresttoss(target_mob) //Automatically throw them backwards because of disarm intent
 
 /mob/living/carbon/Xenomorph/AI/Crusher/mature
-	upgrade = 1
+	upgrade = XENO_UPGRADE_ONE
 
 /mob/living/carbon/Xenomorph/AI/Crusher/elder
-	upgrade = 2
+	upgrade = XENO_UPGRADE_TWO
 
 /mob/living/carbon/Xenomorph/AI/Crusher/ancient
-	upgrade = 3
+	upgrade = XENO_UPGRADE_THREE
 
 /mob/living/carbon/Xenomorph/AI/Ravager
 	caste_base_type = /mob/living/carbon/Xenomorph/Ravager
@@ -588,19 +587,19 @@ var/global/list/AIXenosWithoutSquad = list() //List of all AI xenos without squa
 		Ravage(target_mob)
 
 /mob/living/carbon/Xenomorph/AI/Ravager/mature
-	upgrade = 1
+	upgrade = XENO_UPGRADE_ONE
 
 /mob/living/carbon/Xenomorph/AI/Ravager/elder
-	upgrade = 2
+	upgrade = XENO_UPGRADE_TWO
 
 /mob/living/carbon/Xenomorph/AI/Ravager/ancient
-	upgrade = 3
+	upgrade = XENO_UPGRADE_THREE
 
 /mob/living/carbon/Xenomorph/AI/Hunter
 	caste_base_type = /mob/living/carbon/Xenomorph/Hunter
 	name = "Hunter"
 	desc = "A beefy, fast alien with sharp claws."
-	icon = 'icons/Xeno/1x1_Xenos.dmi'
+	icon = 'icons/Xeno/2x2_Xenos.dmi'
 	icon_state = "Hunter Running"
 	health = 150
 	maxHealth = 150
@@ -635,19 +634,19 @@ var/global/list/AIXenosWithoutSquad = list() //List of all AI xenos without squa
 		doingaction = 0
 
 /mob/living/carbon/Xenomorph/AI/Hunter/mature
-	upgrade = 1
+	upgrade = XENO_UPGRADE_ONE
 
 /mob/living/carbon/Xenomorph/AI/Hunter/elder
-	upgrade = 2
+	upgrade = XENO_UPGRADE_TWO
 
 /mob/living/carbon/Xenomorph/AI/Hunter/ancient
-	upgrade = 3
+	upgrade = XENO_UPGRADE_THREE
 
 /mob/living/carbon/Xenomorph/AI/Spitter
 	caste_base_type = /mob/living/carbon/Xenomorph/Spitter
 	name = "Spitter"
 	desc = "A gross, oozing alien of some kind."
-	icon = 'icons/Xeno/1x1_Xenos.dmi'
+	icon = 'icons/Xeno/48x48_Xenos.dmi'
 	icon_state = "Spitter Walking"
 	health = 180
 	maxHealth = 180
@@ -677,13 +676,13 @@ var/global/list/AIXenosWithoutSquad = list() //List of all AI xenos without squa
 		xeno_spit(target_mob)
 
 /mob/living/carbon/Xenomorph/AI/Spitter/mature
-	upgrade = 1
+	upgrade = XENO_UPGRADE_ONE
 
 /mob/living/carbon/Xenomorph/AI/Spitter/elder
-	upgrade = 2
+	upgrade = XENO_UPGRADE_TWO
 
 /mob/living/carbon/Xenomorph/AI/Spitter/ancient
-	upgrade = 3
+	upgrade = XENO_UPGRADE_THREE
 
 /mob/living/carbon/Xenomorph/AI/Defender
 	caste_base_type = /mob/living/carbon/Xenomorph/Defender
@@ -711,13 +710,13 @@ var/global/list/AIXenosWithoutSquad = list() //List of all AI xenos without squa
 		)
 
 /mob/living/carbon/Xenomorph/AI/Defender/mature
-	upgrade = 1
+	upgrade = XENO_UPGRADE_ONE
 
 /mob/living/carbon/Xenomorph/AI/Defender/elder
-	upgrade = 2
+	upgrade = XENO_UPGRADE_TWO
 
 /mob/living/carbon/Xenomorph/AI/Defender/ancient
-	upgrade = 3
+	upgrade = XENO_UPGRADE_THREE
 
 /mob/living/carbon/Xenomorph/AI/Defender/ConsiderAbilities(isattacking)
 	if(isattacking && !used_headbutt && !fortify)
@@ -766,13 +765,13 @@ var/global/list/AIXenosWithoutSquad = list() //List of all AI xenos without squa
 		fling(target_mob)
 
 /mob/living/carbon/Xenomorph/AI/Warrior/mature
-	upgrade = 1
+	upgrade = XENO_UPGRADE_ONE
 
 /mob/living/carbon/Xenomorph/AI/Warrior/elder
-	upgrade = 2
+	upgrade = XENO_UPGRADE_TWO
 
 /mob/living/carbon/Xenomorph/AI/Warrior/ancient
-	upgrade = 3
+	upgrade = XENO_UPGRADE_THREE
 
 /mob/living/carbon/Xenomorph/AI/Praetorian
 	caste_base_type = /mob/living/carbon/Xenomorph/Praetorian
@@ -812,19 +811,19 @@ var/global/list/AIXenosWithoutSquad = list() //List of all AI xenos without squa
 		xeno_spit(target_mob)
 
 /mob/living/carbon/Xenomorph/AI/Praetorian/mature
-	upgrade = 1
+	upgrade = XENO_UPGRADE_ONE
 
 /mob/living/carbon/Xenomorph/AI/Praetorian/elder
-	upgrade = 2
+	upgrade = XENO_UPGRADE_TWO
 
 /mob/living/carbon/Xenomorph/AI/Praetorian/ancient
-	upgrade = 3
+	upgrade = XENO_UPGRADE_THREE
 
 /mob/living/carbon/Xenomorph/AI/Sentinel
 	caste_base_type = /mob/living/carbon/Xenomorph/Sentinel
 	name = "Sentinel"
 	desc = "A slithery, spitting kind of alien."
-	icon = 'icons/Xeno/1x1_Xenos.dmi'
+	icon = 'icons/Xeno/48x48_Xenos.dmi'
 	icon_state = "Sentinel Walking"
 	health = 150
 	maxHealth = 150
@@ -903,10 +902,10 @@ var/global/list/AIXenosWithoutSquad = list() //List of all AI xenos without squa
 		playsound(loc, "alien_resin_build", 25)
 
 /mob/living/carbon/Xenomorph/AI/Hivelord/mature
-	upgrade = 1
+	upgrade = XENO_UPGRADE_ONE
 
 /mob/living/carbon/Xenomorph/AI/Hivelord/elder
-	upgrade = 2
+	upgrade = XENO_UPGRADE_TWO
 
 /mob/living/carbon/Xenomorph/AI/Hivelord/ancient
-	upgrade = 3
+	upgrade = XENO_UPGRADE_THREE

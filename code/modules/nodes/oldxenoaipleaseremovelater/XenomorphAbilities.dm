@@ -147,13 +147,13 @@ When I'm not lazy enough I'll port everything from xeno AI life to regular xeno 
 	resting = FALSE
 	update_canmove()
 	update_icons()
-
+/*
 	if(hivenumber && hivenumber <= hive_datum.len)
 		var/datum/hive_status/hive = hive_datum[hivenumber]
 
 		for(var/mob/living/carbon/Xenomorph/L in hive.xeno_leader_list)
 			L.handle_xeno_leader_pheromones(src)
-
+*/
 	xeno_message("<span class='xenoannounce'>The Queen has grown an ovipositor, evolution progress resumed.</span>", 3, hivenumber)
 
 /mob/living/carbon/Xenomorph/AI/Ravager/proc/charge(atom/T)

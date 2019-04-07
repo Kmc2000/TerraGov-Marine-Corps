@@ -30,7 +30,7 @@
 			door.open(1)
 
 /mob/living/carbon/Xenomorph/Drone/node/proc/DoMove()
-	step_towards(src, next_node)
+	walk_to(src, next_node)
 	if(get_dist(src, next_node) < 2)
 		next_node.color = initial(color)
 		current_node = next_node
@@ -40,7 +40,7 @@
 /mob/living/carbon/Xenomorph/Drone/node/proc/ConsiderMovement()
 	//if(!next_node || next_node == current_node)
 	//	next_node = current_node.GetNodeInDirInAdj(pick(DiagonalToCardinal(get_dir(src, destination_node))))
-	step_towards(src, next_node)
+	walk_to(src, next_node, 0, movement_delay() + 3)
 	for(var/obj/machinery/door/airlock/adoor in range(1))
 		if(adoor)
 			adoor.open(1)
