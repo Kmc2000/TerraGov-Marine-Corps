@@ -14,15 +14,14 @@
 /obj/effect/AINode/proc/MakeAdjacents()
 	datumnode.adjacent_nodes = list()
 	for(var/obj/effect/AINode/node in GLOB.allnodes)
-		if((node != src) && (get_dir(src, node) in GLOB.cardinals) && (get_dist(src, node) < 3))
-			var/IsClearPath = TRUE //If a getline() to the node is nondense at all
+		if(node && (node != src) && (get_dist(src, node) < 15) && (get_dir(src, node) in CARDINAL_DIRS))
 			var/list/turf/turfs = getline(src, node)
-			for(var/turf/T in turfs)
-				if(T.density)
-					IsClearPath = FALSE
-					break
-			if(IsClearPath)
-				datumnode.adjacent_nodes |= node //Probably going to get expensive with the sanity |=, will have to test out later
+			var/IsDense = FALSE
+			for(var/turf/turf in turfs)
+				if(istype(turf, /turf/closed))
+					IsDense = TRUE
+			if(!IsDense)
+				datumnode.adjacent_nodes += node
 
 /obj/effect/AINode/debug //A debug version of the AINode; makes it visible to allow for easy var editing
 

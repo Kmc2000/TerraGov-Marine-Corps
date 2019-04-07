@@ -7,27 +7,56 @@
 
 /mob/living/carbon/Xenomorph/Drone/node/Initialize()
 	..()
+	SSai.aimobs += src
 	for(var/obj/effect/AINode/node in range(4))
 		if(node)
 			current_node = node
 			forceMove(current_node.loc)
-			break
+			next_node = pick(current_node.datumnode.adjacent_nodes)
+			next_node.color = "#FF69B4"
+
+	/*		break
 	GetRandomDestination()
 	var/nextnode = current_node.GetNodeInDirInAdj(pick(DiagonalToCardinal(get_dir(src, destination_node))))
 	if(nextnode)
 		next_node = nextnode
-	ConsiderMovement()
+	*/
+	//ConsiderMovement()
+
+/mob/living/carbon/Xenomorph/Drone/node/proc/DealWithObstruct()
+	var/turf/turf = get_step_towards(src, next_node)
+	for(var/obj/machinery/door/airlock/door in turf)
+		if(door && door.density)
+			door.open(1)
+
+/mob/living/carbon/Xenomorph/Drone/node/proc/DoMove()
+	step_towards(src, next_node)
+	if(get_dist(src, next_node) < 2)
+		next_node.color = initial(color)
+		current_node = next_node
+		next_node = pick(current_node.datumnode.adjacent_nodes)
+		next_node.color = "#FF69B4"
 
 /mob/living/carbon/Xenomorph/Drone/node/proc/ConsiderMovement()
-	if(!next_node || next_node == current_node)
-		next_node = current_node.GetNodeInDirInAdj(pick(DiagonalToCardinal(get_dir(src, destination_node))))
-	forceMove(next_node.loc)
-	current_node = next_node
+	//if(!next_node || next_node == current_node)
+	//	next_node = current_node.GetNodeInDirInAdj(pick(DiagonalToCardinal(get_dir(src, destination_node))))
+	step_towards(src, next_node)
+	for(var/obj/machinery/door/airlock/adoor in range(1))
+		if(adoor)
+			adoor.open(1)
+	//forceMove(next_node.loc)
+	if(get_dist(src, next_node) < 2)
+		next_node.color = initial(color)
+		current_node = next_node
+		next_node = pick(current_node.datumnode.adjacent_nodes)
+		next_node.color = "#FF69B4"
+	/*
 	if(current_node == destination_node)
 		destination_node.color = initial(color)
 		GetRandomDestination()
+	*/
 
-	addtimer(CALLBACK(src, .proc/ConsiderMovement), 3)
+	addtimer(CALLBACK(src, .proc/ConsiderMovement), 1)
 	return
 
 /mob/living/carbon/Xenomorph/Drone/node/proc/GetRandomDestination() //Gets a new random destination that isn't it's current node
