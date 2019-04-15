@@ -5,9 +5,11 @@
 	icon = 'icons/mob/screen1.dmi'
 	icon_state = "x4" //Pure white 'X'
 	var/datum/ai_node/datumnode = new/datum/ai_node() //Stores things about the AI node
+	var/turf/srcturf //The turf this is on
 
 /obj/effect/AINode/Initialize() //Add ourselve to the global list of nodes
 	..()
+	srcturf = loc
 	datumnode.parentnode = src
 	GLOB.allnodes += src
 

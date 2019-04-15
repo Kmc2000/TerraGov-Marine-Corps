@@ -1318,6 +1318,7 @@
 #include "code\modules\nano\nanomanager.dm"
 #include "code\modules\nano\nanomapgen.dm"
 #include "code\modules\nano\nanoui.dm"
+#include "code\modules\nodes\datum_ai.dm"
 #include "code\modules\nodes\datum_node.dm"
 #include "code\modules\nodes\effect_node.dm"
 #include "code\modules\nodes\helpers.dm"

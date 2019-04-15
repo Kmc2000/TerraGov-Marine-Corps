@@ -1,19 +1,11 @@
 //It's like regular xenomorph but now it uses nodes, used for testing the pathfinding
 
 /mob/living/carbon/Xenomorph/Drone/node
-	var/obj/effect/AINode/current_node //Current node it's at
-	var/obj/effect/AINode/next_node //Node it wants to get to next
-	var/obj/effect/AINode/destination_node //Node it wants to get to after traveling VIA next_node
+	var/datum/ai_behavior/ai_datum = new//datum/ai_behavior/ai_datum(src)
 
 /mob/living/carbon/Xenomorph/Drone/node/Initialize()
+	ai_datum.parentmob = src
 	..()
-	SSai.aimobs += src
-	for(var/obj/effect/AINode/node in range(4))
-		if(node)
-			current_node = node
-			forceMove(current_node.loc)
-			next_node = pick(current_node.datumnode.adjacent_nodes)
-			next_node.color = "#FF69B4"
 
 	/*		break
 	GetRandomDestination()
@@ -23,18 +15,19 @@
 	*/
 	//ConsiderMovement()
 
+/*
 /mob/living/carbon/Xenomorph/Drone/node/proc/DealWithObstruct()
-	var/turf/turf = get_step_towards(src, next_node)
+	var/turf/turf = get_step_towards(src, ai_datum.next_node)
 	for(var/obj/machinery/door/airlock/door in turf)
 		if(door && door.density)
 			door.open(1)
 
 /mob/living/carbon/Xenomorph/Drone/node/proc/DoMove()
-	walk_to(src, next_node)
-	if(get_dist(src, next_node) < 2)
+	walk_to(src, ai_datum.next_node)
+	if(get_dist(src, ai_datum.next_node) < 2)
 		next_node.color = initial(color)
-		current_node = next_node
-		next_node = pick(current_node.datumnode.adjacent_nodes)
+		current_node = ai_datum.next_node
+		next_node = pick(ai_datum.current_node.datumnode.adjacent_nodes)
 		next_node.color = "#FF69B4"
 
 /mob/living/carbon/Xenomorph/Drone/node/proc/ConsiderMovement()
@@ -58,9 +51,4 @@
 
 	addtimer(CALLBACK(src, .proc/ConsiderMovement), 1)
 	return
-
-/mob/living/carbon/Xenomorph/Drone/node/proc/GetRandomDestination() //Gets a new random destination that isn't it's current node
-	destination_node = pick(GLOB.allnodes)
-	while(destination_node == current_node)
-		destination_node = pick(GLOB.allnodes) //Insurence
-	destination_node.color = "#FF69B4"
+*/
