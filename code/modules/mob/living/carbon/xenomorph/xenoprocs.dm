@@ -371,6 +371,7 @@
 			S.forceMove(get_turf(src))
 			if(isliving(S))
 				var/mob/living/M = S
+				M.SetKnockeddown(1)
 				M.adjust_blindness(-1)
 
 	if(contents.len) //Get rid of anything that may be stuck inside us as well
@@ -478,7 +479,7 @@
 		stop_momentum(charge_dir)
 		return FALSE
 
-	if(dir != charge_dir || m_intent == MOVE_INTENT_WALK || istype(loc, /turf/open/gm/river))
+	if(dir != charge_dir || m_intent == MOVE_INTENT_WALK || istype(loc, /turf/open/ground/river))
 		stop_momentum(charge_dir)
 		return FALSE
 

@@ -371,9 +371,15 @@
 /turf/closed/wall/resin/flamer_fire_act()
 	take_damage(50)
 
+/turf/closed/wall/resin/proc/thicken()
+	var/prev_oldturf = oldTurf
+	ChangeTurf(/turf/closed/wall/resin/thick)
+	oldTurf = prev_oldturf
+	return TRUE
+
 //this one is only for map use
 /turf/closed/wall/resin/ondirt
-	oldTurf = "/turf/open/gm/dirt"
+	oldTurf = "/turf/open/floor/plating/ground/dirt"
 
 /turf/closed/wall/resin/thick
 	name = "thick resin wall"
@@ -381,6 +387,9 @@
 	damage_cap = 300
 	icon_state = "thickresin0"
 	walltype = "thickresin"
+
+/turf/closed/wall/resin/thick/thicken()
+	return FALSE
 
 /turf/closed/wall/resin/membrane
 	name = "resin membrane"
@@ -391,9 +400,14 @@
 	opacity = 0
 	alpha = 180
 
+/turf/closed/wall/resin/membrane/thicken()
+	var/prev_oldturf = oldTurf
+	ChangeTurf(/turf/closed/wall/resin/membrane/thick)
+	oldTurf = prev_oldturf
+
 //this one is only for map use
 /turf/closed/wall/resin/membrane/ondirt
-	oldTurf = "/turf/open/gm/dirt"
+	oldTurf = "/turf/open/floor/plating/ground/dirt"
 
 /turf/closed/wall/resin/membrane/thick
 	name = "thick resin membrane"
