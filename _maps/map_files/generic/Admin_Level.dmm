@@ -175,8 +175,7 @@
 /area/tdome)
 "aA" = (
 /obj/structure/window/reinforced{
-	dir = 5;
-	health = 80
+	dir = 5
 	},
 /obj/effect/forcefield{
 	desc = "You can't get in. Heh.";
@@ -186,8 +185,7 @@
 /area/tdome)
 "aB" = (
 /obj/structure/window/reinforced{
-	dir = 5;
-	health = 80
+	dir = 5
 	},
 /obj/effect/forcefield{
 	desc = "You can't get in. Heh.";
@@ -432,8 +430,7 @@
 /area/tdome)
 "bl" = (
 /obj/structure/window/reinforced{
-	dir = 5;
-	health = 80
+	dir = 5
 	},
 /obj/effect/forcefield{
 	desc = "You can't get in. Heh.";
@@ -1213,8 +1210,7 @@
 	dir = 8
 	},
 /obj/structure/window/reinforced{
-	dir = 4;
-	health = 80
+	dir = 4
 	},
 /obj/machinery/door/window/southleft{
 	dir = 1;
@@ -1345,8 +1341,7 @@
 /obj/structure/table/reinforced,
 /obj/machinery/door/window/southleft,
 /obj/structure/window/reinforced{
-	dir = 4;
-	health = 80
+	dir = 4
 	},
 /obj/structure/window/reinforced{
 	dir = 8
@@ -1615,8 +1610,7 @@
 /area/syndicate_station)
 "ea" = (
 /obj/structure/window/reinforced{
-	dir = 8;
-	health = 80
+	dir = 8
 	},
 /obj/structure/window/reinforced{
 	dir = 4
@@ -1633,8 +1627,7 @@
 /area/syndicate_station)
 "eb" = (
 /obj/structure/window/reinforced{
-	dir = 8;
-	health = 80
+	dir = 8
 	},
 /obj/machinery/door/window/northright{
 	icon_state = "right";
@@ -1673,8 +1666,7 @@
 /obj/structure/table/reinforced,
 /obj/item/weapon/twohanded/dualsaber,
 /obj/structure/window/reinforced{
-	dir = 8;
-	health = 80
+	dir = 8
 	},
 /obj/structure/window/reinforced{
 	dir = 4
@@ -1692,8 +1684,7 @@
 	dir = 4
 	},
 /obj/structure/window/reinforced{
-	dir = 8;
-	health = 80
+	dir = 8
 	},
 /obj/structure/window/reinforced,
 /turf/open/floor/holofloor{
@@ -1707,8 +1698,7 @@
 	dir = 4
 	},
 /obj/structure/window/reinforced{
-	dir = 8;
-	health = 80
+	dir = 8
 	},
 /obj/structure/window/reinforced,
 /obj/item/clothing/mask/gas/voice/space_ninja{
@@ -1723,8 +1713,7 @@
 "ei" = (
 /obj/structure/table/reinforced,
 /obj/structure/window/reinforced{
-	dir = 8;
-	health = 80
+	dir = 8
 	},
 /obj/structure/window/reinforced,
 /obj/item/teleportation_scroll{
@@ -1755,8 +1744,7 @@
 "em" = (
 /obj/structure/table/reinforced,
 /obj/structure/window/reinforced{
-	dir = 8;
-	health = 80
+	dir = 8
 	},
 /obj/machinery/door/window/northright{
 	icon_state = "right";
@@ -2066,27 +2054,6 @@
 	dir = 5
 	},
 /area/centcom/control)
-"fi" = (
-/obj/machinery/telecomms/hub/preset_cent,
-/turf/open/floor/almayer{
-	icon_plating = "tcomms";
-	icon_state = "tcomms"
-	},
-/area/centcom/control)
-"fj" = (
-/obj/machinery/telecomms/allinone/interceptor,
-/turf/open/floor/almayer{
-	icon_plating = "tcomms";
-	icon_state = "tcomms"
-	},
-/area/centcom/control)
-"fk" = (
-/obj/machinery/telecomms/relay/preset/centcom,
-/turf/open/floor/almayer{
-	icon_plating = "tcomms";
-	icon_state = "tcomms"
-	},
-/area/centcom/control)
 "fl" = (
 /turf/open/floor/almayer{
 	icon_plating = "tcomms";
@@ -2095,20 +2062,6 @@
 /area/centcom/control)
 "fm" = (
 /obj/machinery/r_n_d/server/centcom,
-/turf/open/floor/almayer{
-	icon_plating = "tcomms";
-	icon_state = "tcomms"
-	},
-/area/centcom/control)
-"fn" = (
-/obj/machinery/telecomms/processor/preset_cent,
-/turf/open/floor/almayer{
-	icon_plating = "tcomms";
-	icon_state = "tcomms"
-	},
-/area/centcom/control)
-"fo" = (
-/obj/machinery/telecomms/broadcaster/preset_cent,
 /turf/open/floor/almayer{
 	icon_plating = "tcomms";
 	icon_state = "tcomms"
@@ -2138,27 +2091,6 @@
 	dir = 2
 	},
 /area/syndicate_station)
-"fr" = (
-/obj/machinery/telecomms/receiver/preset_cent,
-/turf/open/floor/almayer{
-	icon_plating = "tcomms";
-	icon_state = "tcomms"
-	},
-/area/centcom/control)
-"fs" = (
-/obj/machinery/telecomms/bus/preset_cent,
-/turf/open/floor/almayer{
-	icon_plating = "tcomms";
-	icon_state = "tcomms"
-	},
-/area/centcom/control)
-"ft" = (
-/obj/machinery/telecomms/server/presets/centcomm,
-/turf/open/floor/almayer{
-	icon_plating = "tcomms";
-	icon_state = "tcomms"
-	},
-/area/centcom/control)
 "fu" = (
 /obj/machinery/door/airlock/almayer/generic{
 	dir = 2
@@ -2382,8 +2314,7 @@
 	},
 /obj/structure/window/reinforced,
 /obj/structure/window/reinforced{
-	dir = 4;
-	health = 80
+	dir = 4
 	},
 /obj/machinery/door/window/southleft{
 	dir = 8;
@@ -2556,8 +2487,7 @@
 /obj/structure/table/reinforced,
 /obj/effect/decal/warning_stripes,
 /obj/structure/window/reinforced{
-	dir = 4;
-	health = 80
+	dir = 4
 	},
 /obj/machinery/door/window/southleft{
 	dir = 1;
@@ -2697,8 +2627,7 @@
 /area/syndicate_station)
 "gH" = (
 /obj/structure/window/reinforced{
-	dir = 5;
-	health = 80
+	dir = 5
 	},
 /obj/structure/grille,
 /turf/open/floor/holofloor{
@@ -3866,8 +3795,7 @@
 "jZ" = (
 /obj/structure/grille,
 /obj/structure/window/reinforced{
-	dir = 5;
-	health = 80
+	dir = 5
 	},
 /turf/open/floor/plating,
 /area/syndicate_station)
@@ -6587,6 +6515,10 @@
 /obj/item/weapon/baseballbat/metal,
 /turf/open/ground/river,
 /area/deathmatch)
+"Qm" = (
+/obj/machinery/telecomms/relay/preset/telecomms,
+/turf/open/floor/almayer,
+/area/centcom/control)
 
 (1,1,1) = {"
 aa
@@ -13745,7 +13677,7 @@ ep
 eE
 fa
 fa
-fa
+Qm
 fe
 fh
 fh
@@ -14052,7 +13984,7 @@ fa
 fa
 fe
 fh
-fi
+fl
 fh
 fl
 dX
@@ -14356,9 +14288,9 @@ fa
 fa
 ff
 fh
-fj
+fl
 fh
-fo
+fl
 dX
 eo
 eo
@@ -14510,7 +14442,7 @@ fe
 fh
 fh
 fh
-fn
+fl
 dX
 eo
 eo
@@ -14660,9 +14592,9 @@ fa
 fa
 fe
 fh
-fk
+fl
 fh
-fs
+fl
 dX
 eo
 eo
@@ -14814,7 +14746,7 @@ fe
 fh
 fh
 fh
-fr
+fl
 dX
 eo
 eo
@@ -14966,7 +14898,7 @@ fe
 fh
 fh
 fh
-ft
+fl
 dX
 eo
 eo
