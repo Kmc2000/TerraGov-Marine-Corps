@@ -5,6 +5,7 @@
 
 /mob/living/carbon/Xenomorph/Drone/node/Initialize()
 	ai_datum.parentmob = src
+	ai_datum.Init()
 	..()
 
 	/*		break
