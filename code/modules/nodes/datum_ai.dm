@@ -3,7 +3,7 @@ Datums that represent an AI mind and it's way of doing various things like movem
 Base datums for stuff like humans or xenos have possible actions to do as well as attitudes
 */
 
-//The most basic of AI; can pathfind to a turf
+//The most basic of AI; can pathfind to a turf and path around objects in it's path if needed to
 /datum/ai_behavior
 
 	var/mob/living/carbon/parentmob //The mob this is attached to; must be updated for inheritence or else things can break
@@ -35,7 +35,7 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 		NextNodeReached()
 	else
 		if(lastturf == parentmob.loc) //No change in turfs since last AI process update, switch to more intelligent pathfinding for a bit
-			HandleObstruction()
+			HandleObstruction(get_step_towards(parentmob, next_node))
 		else //Should be alright going with dumb AI
 			walk_towards(parentmob, next_node, parentmob.movement_delay())
 
@@ -53,7 +53,8 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 /datum/ai_behavior/proc/DestinationReached() //We reached our destination, let's go to another adjacent node
 	GetRandomDestination()
 
-/datum/ai_behavior/proc/HandleObstruction() //If HandleMovement fails, do some HandleObstruction()
+//Comes with the turf of the tile it's going to
+/datum/ai_behavior/proc/HandleObstruction(var/turf/blockedturf) //If HandleMovement fails, do some HandleObstruction()
 	//In this case, we switch to intelligent pathfinding to move around the obstacle until HandleMovement() gets called again
 	walk_to(parentmob, next_node, parentmob.movement_delay())
 
@@ -62,3 +63,10 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 	while(destination_node == current_node) //Insurence
 		destination_node = pick(GLOB.allnodes)
 	destination_node.color = "#FF69B4"
+
+//Basic datum AI for a xeno; ability to use acid on obstacles if valid as well as attack obstacles
+
+/datum/ai_behavior/xeno
+
+/datum/ai_behavior/xeno/HandleObstruction(var/turf/blockedturf)
+	qdel(blockedturf)
