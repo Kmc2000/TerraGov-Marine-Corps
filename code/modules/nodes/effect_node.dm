@@ -17,13 +17,15 @@
 	datumnode.adjacent_nodes = list()
 	for(var/obj/effect/AINode/node in GLOB.allnodes)
 		if(node && (node != src) && (get_dist(src, node) < 15) && (get_dir(src, node) in CARDINAL_DIRS))
+			/*
 			var/list/turf/turfs = getline(src, node)
 			var/IsDense = FALSE
 			for(var/turf/turf in turfs)
 				if(istype(turf, /turf/closed))
 					IsDense = TRUE
 			if(!IsDense)
-				datumnode.adjacent_nodes += node
+			*/
+			datumnode.adjacent_nodes += node
 
 /obj/effect/AINode/debug //A debug version of the AINode; makes it visible to allow for easy var editing
 
