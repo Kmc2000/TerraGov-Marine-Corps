@@ -2,7 +2,7 @@
 
 SUBSYSTEM_DEF(ai)
 	name = "AI Controller"
-	wait = 10
+	wait = 5
 	var/list/aidatums = list()
 	var/list/last_turf = list()
 	var/list/current_run

@@ -67,11 +67,13 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 //Basic datum AI for a xeno; ability to use acid on obstacles if valid as well as attack obstacles
 
 /datum/ai_behavior/xeno
+	parentmob = new/mob/living/carbon/Xenomorph()
+	//mob/living/carbon/Xenomorph/parentmob //Retypecast
 
 /datum/ai_behavior/xeno/Process()
 	..()
 	HandleAbility()
-	
+
 /datum/ai_behavior/xeno/proc/HandleAbility()
 
 /datum/ai_behavior/xeno/HandleObstruction(var/turf/blockedturf)

@@ -1334,6 +1334,7 @@
 #include "code\modules\nodes\effect_node.dm"
 #include "code\modules\nodes\helpers.dm"
 #include "code\modules\nodes\nodetester.dm"
+#include "code\modules\nodes\xenocastes\drone.dm"
 #include "code\modules\organs\limb_objects.dm"
 #include "code\modules\organs\limbs.dm"
 #include "code\modules\organs\organ_alien.dm"
