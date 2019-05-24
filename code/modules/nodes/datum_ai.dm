@@ -35,9 +35,9 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 		NextNodeReached()
 	else
 		if(lastturf == parentmob.loc) //No change in turfs since last AI process update, switch to more intelligent pathfinding for a bit
-			HandleObstruction(get_step_towards(parentmob, next_node))
+			HandleObstruction(get_step(parentmob, get_dir(parentmob, next_node)))
 		else //Should be alright going with dumb AI
-			walk_towards(parentmob, next_node, parentmob.movement_delay())
+			walk_towards(parentmob, next_node, parentmob.movement_delay() - 1)
 
 //We reached to one of the nodes on the way to destination node, if it is destination node lets get a new destination
 /datum/ai_behavior/proc/NextNodeReached()
@@ -48,6 +48,9 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 	var/possiblenode = get_node_towards(current_node, destination_node)
 	if(possiblenode)
 		next_node = possiblenode
+		next_node.color = "#FF6900"
+	else
+		next_node = pick(current_node.datumnode.adjacent_nodes)
 		next_node.color = "#FF6900"
 
 /datum/ai_behavior/proc/DestinationReached() //We reached our destination, let's go to another adjacent node
@@ -77,4 +80,5 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 /datum/ai_behavior/xeno/proc/HandleAbility()
 
 /datum/ai_behavior/xeno/HandleObstruction(var/turf/blockedturf)
-	qdel(blockedturf)
+	//qdel(blockedturf)
+	walk_to(parentmob, next_node, parentmob.movement_delay())
