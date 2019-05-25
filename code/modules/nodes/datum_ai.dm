@@ -35,7 +35,7 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 		NextNodeReached()
 	else
 		if(lastturf == parentmob.loc) //No change in turfs since last AI process update, switch to more intelligent pathfinding for a bit
-			HandleObstruction(get_step(parentmob, get_dir(parentmob, next_node)))
+			HandleObstruction()
 		else //Should be alright going with dumb AI
 			walk_towards(parentmob, next_node, parentmob.movement_delay() - 1)
 
@@ -57,7 +57,7 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 	GetRandomDestination()
 
 //Comes with the turf of the tile it's going to
-/datum/ai_behavior/proc/HandleObstruction(var/turf/blockedturf) //If HandleMovement fails, do some HandleObstruction()
+/datum/ai_behavior/proc/HandleObstruction() //If HandleMovement fails, do some HandleObstruction()
 	//In this case, we switch to intelligent pathfinding to move around the obstacle until HandleMovement() gets called again
 	walk_to(parentmob, next_node, parentmob.movement_delay())
 
@@ -79,6 +79,9 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 
 /datum/ai_behavior/xeno/proc/HandleAbility()
 
-/datum/ai_behavior/xeno/HandleObstruction(var/turf/blockedturf)
-	//qdel(blockedturf)
+/datum/ai_behavior/xeno/HandleObstruction()
+
 	walk_to(parentmob, next_node, parentmob.movement_delay())
+	for(var/dir in cardinal)
+		for(var/turf/obstacle in get_step(src, dir))
+			qdel(obstacle)
