@@ -60,6 +60,9 @@ Currently only has the tank hardpoints
 		return
 	if(!iswelder(W) && !iswrench(W))
 		return ..()
+	if(obj_integrity >= max_integrity)
+		to_chat(user, "<span class='notice'>[src] is already in perfect conditions.</span>")
+		return
 	var/repair_delays = 6
 	var/obj/item/tool/repair_tool = /obj/item/tool/weldingtool
 	switch(slot)
@@ -73,14 +76,16 @@ Currently only has the tank hardpoints
 			repair_delays = 2
 		if(HDPT_ARMOR)
 			repair_delays = 10
-	if(!istype(W, repair_tool))
-		to_chat(user, "<span class='warning'>That's the wrong tool. Use a [iswrench(repair_tool) ? "wrench" : "welder"].</span>")
-		return
 	var/obj/item/tool/weldingtool/WT = iswelder(W) ? W : null
+	if(!istype(W, repair_tool))
+		to_chat(user, "<span class='warning'>That's the wrong tool. Use a [WT ? "wrench" : "welder"].</span>")
+		return
 	if(WT && !WT.isOn())
 		to_chat(user, "<span class='warning'>You need to light your [WT] first.</span>")
 		return
-	if(!do_after(user, 3 SECONDS * repair_delays, TRUE, repair_delays, BUSY_ICON_FRIENDLY) || !user.Adjacent(src))
+	user.visible_message("<span class='notice'>[user] starts repairing [src].</span>",
+		"<span class='notice'>You start repairing [src].</span>")
+	if(!do_after(user, 3 SECONDS * repair_delays, TRUE, src, BUSY_ICON_BUILD))
 		user.visible_message("<span class='notice'>[user] stops repairing [src].</span>",
 							"<span class='notice'>You stop repairing [src].</span>")
 		return
@@ -88,7 +93,7 @@ Currently only has the tank hardpoints
 		if(!WT.isOn())
 			return
 		WT.remove_fuel(repair_delays, user)
-	user.visible_message("<span class='notice'>[user] finishs repairing [src].</span>",
+	user.visible_message("<span class='notice'>[user] finishes repairing [src].</span>",
 		"<span class='notice'>You finish repairing [src].</span>")
 	obj_integrity = max_integrity
 
@@ -137,7 +142,7 @@ Currently only has the tank hardpoints
 
 	var/atom/target = owner ? owner : src
 
-	if(!do_after(user, 10, TRUE, 5, BUSY_ICON_FRIENDLY) || !target.Adjacent(user))
+	if(!do_after(user, 10, TRUE, target) || QDELETED(src))
 		to_chat(user, "<span class='warning'>Something interrupted you while loading [src].</span>")
 		return FALSE
 
@@ -255,9 +260,10 @@ Currently only has the tank hardpoints
 
 	to_chat(usr, "<span class='warning'>Preparing to fire... keep the tank still for [delay * 0.1] seconds.</span>")
 
-	if(!do_after(usr, delay, FALSE, 5, BUSY_ICON_HOSTILE, null, TRUE) )
+	if(!do_after(usr, delay, FALSE, src) || QDELETED(owner))
 		to_chat(usr, "<span class='warning'>The [name]'s firing was interrupted.</span>")
 		qdel(TL)
+
 		return
 
 	qdel(TL)
@@ -420,7 +426,7 @@ Currently only has the tank hardpoints
 
 	to_chat(usr, "<span class='warning'>Preparing to fire... keep the tank still for [delay * 0.1] seconds.</span>")
 
-	if(!do_after(usr, delay, FALSE, 5, BUSY_ICON_HOSTILE, null, TRUE))
+	if(!do_after(usr, delay, FALSE, src) || QDELETED(owner))
 		to_chat(usr, "<span class='warning'>The [name]'s firing was interrupted.</span>")
 		qdel(TL)
 		return

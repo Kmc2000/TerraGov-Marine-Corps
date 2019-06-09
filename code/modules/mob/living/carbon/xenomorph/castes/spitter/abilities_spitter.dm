@@ -16,7 +16,7 @@
 	if(!istype(target)) //Something went horribly wrong. Clicked off edge of map probably
 		return
 
-	if(!do_after(X, 5, TRUE, 5, BUSY_ICON_HOSTILE, TRUE, TRUE))
+	if(X.action_busy || !do_after(X, 5, TRUE, target, BUSY_ICON_DANGER))
 		return
 
 	if(!can_use_ability(A, TRUE))
@@ -77,7 +77,7 @@
 
 		for(var/obj/structure/barricade/B in TF)
 			if(get_dir(TF, prev_turf) & B.dir)
-				B.acid_spray_act(src)
+				B.acid_spray_act(owner)
 
 		acid_splat_turf(TF)
 
@@ -87,4 +87,3 @@
 
 		prev_turf = T
 		sleep(2)
-		
