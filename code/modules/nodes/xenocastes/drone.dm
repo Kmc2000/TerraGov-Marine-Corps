@@ -1,4 +1,4 @@
-/mob/living/carbon/Xenomorph/Drone/ai
+/mob/living/carbon/xenomorph/Drone/ai
 	var/datum/ai_behavior/xeno/drone/ai_datum = new
 
 //An AI datum for drones; it makes weeds and pheromones
