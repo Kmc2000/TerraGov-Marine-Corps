@@ -23,11 +23,13 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 			current_node = node
 			parentmob.forceMove(current_node.loc)
 			GetRandomDestination()
-			next_node = get_node_towards(current_node, destination_node)
-			next_node.color = "#FF6900" //Orange
+			next_node = pick(current_node.datumnode.adjacent_nodes) //get_node_towards(current_node, destination_node)
+			//next_node.color = "#FF6900" //Orange
+		break
 
 /datum/ai_behavior/proc/Process() //Processes and updates things
 	HandleMovement()
+	lastturf = parentmob.loc
 
 //We do some moving to a destination
 /datum/ai_behavior/proc/HandleMovement()
@@ -44,6 +46,8 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 	current_node = next_node
 	if(next_node == destination_node)
 		GetRandomDestination()
+	next_node = pick(current_node.datumnode.adjacent_nodes)
+	/*
 	next_node.color = initial(next_node.color)
 	var/possiblenode = get_node_towards(current_node, destination_node)
 	if(possiblenode)
@@ -52,6 +56,8 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 	else
 		next_node = pick(current_node.datumnode.adjacent_nodes)
 		next_node.color = "#FF6900"
+	*/
+
 
 /datum/ai_behavior/proc/DestinationReached() //We reached our destination, let's go to another adjacent node
 	GetRandomDestination()
@@ -59,19 +65,23 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 //Comes with the turf of the tile it's going to
 /datum/ai_behavior/proc/HandleObstruction() //If HandleMovement fails, do some HandleObstruction()
 	//In this case, we switch to intelligent pathfinding to move around the obstacle until HandleMovement() gets called again
-	walk_to(parentmob, next_node, parentmob.movement_delay())
+	walk_to(parentmob, next_node, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
 
 /datum/ai_behavior/proc/GetRandomDestination() //Gets a new random destination that isn't it's current node
 	destination_node = pick(GLOB.allnodes)
 	while(destination_node == current_node) //Insurence
 		destination_node = pick(GLOB.allnodes)
-	destination_node.color = "#FF69B4"
+	//destination_node.color = "#FF69B4"
 
 //Basic datum AI for a xeno; ability to use acid on obstacles if valid as well as attack obstacles
 
 /datum/ai_behavior/xeno
-	parentmob = new/mob/living/carbon/Xenomorph()
+	parentmob = new/mob/living/carbon/xenomorph()
 	//mob/living/carbon/Xenomorph/parentmob //Retypecast
+
+/datum/ai_behavior/xeno/New()
+	..()
+	parentmob.a_intent = INTENT_HARM
 
 /datum/ai_behavior/xeno/Process()
 	..()
@@ -81,7 +91,7 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 
 /datum/ai_behavior/xeno/HandleObstruction()
 
-	walk_to(parentmob, next_node, parentmob.movement_delay())
-	for(var/dir in cardinal)
+	walk_to(parentmob, next_node, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
+	for(var/dir in CARDINAL_DIRS)
 		for(var/turf/obstacle in get_step(src, dir))
 			qdel(obstacle)

@@ -1,5 +1,10 @@
-/mob/living/carbon/xenomorph/Drone/ai
+/mob/living/carbon/xenomorph/drone/ai
 	var/datum/ai_behavior/xeno/drone/ai_datum = new
+
+/mob/living/carbon/xenomorph/drone/ai/Initialize()
+	..()
+	ai_datum.parentmob = src
+	ai_datum.Init()
 
 //An AI datum for drones; it makes weeds and pheromones
 
@@ -9,12 +14,12 @@
 
 /datum/ai_behavior/xeno/drone/Init()
 	..()
-	var/mob/living/carbon/Xenomorph/Drone/parentmob2 = parentmob
+	var/mob/living/carbon/xenomorph/drone/parentmob2 = parentmob
 	parentmob2.current_aura = pick(list("recovery", "warding", "frenzy"))
 
 //We make magic weeds
 /datum/ai_behavior/xeno/drone/HandleAbility()
-	var/mob/living/carbon/Xenomorph/Drone/parentmob2 = parentmob
+	var/mob/living/carbon/xenomorph/drone/parentmob2 = parentmob
 	var/turf/T = get_turf(parentmob2)
 
 	if(!T.is_weedable())

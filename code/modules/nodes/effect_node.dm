@@ -6,6 +6,7 @@
 	icon_state = "x4" //Pure white 'X'
 	var/datum/ai_node/datumnode = new/datum/ai_node() //Stores things about the AI node
 	var/turf/srcturf //The turf this is on
+	alpha = 255
 
 /obj/effect/AINode/Initialize() //Add ourselve to the global list of nodes
 	..()
@@ -16,7 +17,7 @@
 /obj/effect/AINode/proc/MakeAdjacents()
 	datumnode.adjacent_nodes = list()
 	for(var/obj/effect/AINode/node in GLOB.allnodes)
-		if(node && (node != src) && (get_dist(src, node) < 15) && (get_dir(src, node) in CARDINAL_DIRS))
+		if(node && (node != src) && (get_dist(src, node) < 14) && (get_dir(src, node) in CARDINAL_DIRS))
 			/*
 			var/list/turf/turfs = getline(src, node)
 			var/IsDense = FALSE

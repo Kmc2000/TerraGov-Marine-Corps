@@ -1,9 +1,9 @@
 //It's like regular xenomorph but now it uses nodes, used for testing the pathfinding
 
-/mob/living/carbon/xenomorph/Drone/node
+/mob/living/carbon/xenomorph/drone/node
 	var/datum/ai_behavior/xeno/ai_datum = new//datum/ai_behavior/ai_datum(src)
 
-/mob/living/carbon/xenomorph/Drone/node/Initialize()
+/mob/living/carbon/xenomorph/drone/node/Initialize()
 	ai_datum.parentmob = src
 	ai_datum.Init()
 	..()
