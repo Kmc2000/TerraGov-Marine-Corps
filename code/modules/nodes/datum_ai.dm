@@ -65,7 +65,7 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 //Comes with the turf of the tile it's going to
 /datum/ai_behavior/proc/HandleObstruction() //If HandleMovement fails, do some HandleObstruction()
 	//In this case, we switch to intelligent pathfinding to move around the obstacle until HandleMovement() gets called again
-	walk_to(parentmob, next_node, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
+	walk_to(parentmob, next_node, 0, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
 
 /datum/ai_behavior/proc/GetRandomDestination() //Gets a new random destination that isn't it's current node
 	destination_node = pick(GLOB.allnodes)
@@ -91,7 +91,6 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 
 /datum/ai_behavior/xeno/HandleObstruction()
 
-	walk_to(parentmob, next_node, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
-	for(var/dir in CARDINAL_DIRS)
-		for(var/turf/obstacle in get_step(src, dir))
-			qdel(obstacle)
+	walk_to(parentmob, next_node, 0, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
+	for(var/turf/closed/wall/stuff in range(1))
+		qdel(stuff)
