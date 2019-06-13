@@ -11,10 +11,9 @@ SUBSYSTEM_DEF(ai)
 	if(!resume)
 		current_run = aidatums.Copy()
 	while(current_run.len)
-
 		var/datum/ai_behavior/aidatum = current_run[current_run.len]
-		current_run.len--
 		aidatum.Process()
+		current_run.len--
 		if(TICK_CHECK)
 			return
 

@@ -36,10 +36,10 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 	if(get_dist(parentmob, next_node) < 2)
 		NextNodeReached()
 	else
-		if(lastturf == parentmob.loc) //No change in turfs since last AI process update, switch to more intelligent pathfinding for a bit
+		if(parentmob.loc == lastturf) //No change in turfs since last AI process update, switch to more intelligent pathfinding for a bit
 			HandleObstruction()
 		else //Should be alright going with dumb AI
-			walk_towards(parentmob, next_node, parentmob.movement_delay() - 1)
+			walk_towards(parentmob, next_node, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
 
 //We reached to one of the nodes on the way to destination node, if it is destination node lets get a new destination
 /datum/ai_behavior/proc/NextNodeReached()
@@ -79,18 +79,23 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 	parentmob = new/mob/living/carbon/xenomorph()
 	//mob/living/carbon/Xenomorph/parentmob //Retypecast
 
-/datum/ai_behavior/xeno/New()
+/datum/ai_behavior/xeno/Init()
 	..()
 	parentmob.a_intent = INTENT_HARM
 
 /datum/ai_behavior/xeno/Process()
 	..()
-	HandleAbility()
+	if(prob(25))
+		HandleAbility()
 
 /datum/ai_behavior/xeno/proc/HandleAbility()
 
 /datum/ai_behavior/xeno/HandleObstruction()
-
 	walk_to(parentmob, next_node, 0, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
-	for(var/turf/closed/wall/stuff in range(1))
-		qdel(stuff)
+	if(world.time >= parentmob.next_move) //If we can attack again or not
+		for(var/obj/structure/struct in range(1, parentmob))
+			struct.attack_alien(parentmob)
+			parentmob.next_move = parentmob.xeno_caste.attack_delay
+	for(var/obj/machinery/door/airlock/door in range(1, parentmob))
+		if(!door.density)
+			door.open()
