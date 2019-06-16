@@ -17,3 +17,11 @@
 	if(possiblenodes[2]) //Try the other index; return FALSE if neither direction produces a node
 		return possiblenodes[2]
 	return null
+
+/datum/ai_behavior/proc/GetRandomDestination() //Gets a new random destination that isn't it's current node
+	destination_node = pick(GLOB.allnodes)
+	while(destination_node == current_node) //Insurence
+		destination_node = pick(GLOB.allnodes)
+	//destination_node.color = "#FF69B4"
+
+/proc/

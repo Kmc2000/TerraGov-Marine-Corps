@@ -10,7 +10,8 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 	var/turf/destinationturf //Turf that we want to get to
 	var/turf/lastturf //If this is the same as parentmob turf at HandleMovement() then we made no progress in moving, do HandleObstruction from there
 	var/obj/effect/AINode/current_node //Current node the parentmob is at
-	var/obj/effect/AINode/next_node
+	//var/obj/effect/AINode/next_node
+	var/atom/atomtowalkto //What thing we should be moving towards
 	var/obj/effect/AINode/destination_node
 
 /datum/ai_behavior/New()
@@ -22,10 +23,12 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 		if(node)
 			current_node = node
 			parentmob.forceMove(current_node.loc)
-			GetRandomDestination()
-			next_node = pick(current_node.datumnode.adjacent_nodes) //get_node_towards(current_node, destination_node)
+			//GetRandomDestination()
+			atomtowalkto = pick(current_node.datumnode.adjacent_nodes) //get_node_towards(current_node, destination_node)
 			//next_node.color = "#FF6900" //Orange
 		break
+	if(!current_node)
+		qdel(src)
 
 /datum/ai_behavior/proc/Process() //Processes and updates things
 	HandleMovement()
@@ -33,20 +36,21 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 
 //We do some moving to a destination
 /datum/ai_behavior/proc/HandleMovement()
-	if(get_dist(parentmob, next_node) < 2)
-		NextNodeReached()
+	if(get_dist(parentmob, atomtowalkto) < 2)
+		TargetReached()
 	else
 		if(parentmob.loc == lastturf) //No change in turfs since last AI process update, switch to more intelligent pathfinding for a bit
 			HandleObstruction()
 		else //Should be alright going with dumb AI
-			walk_towards(parentmob, next_node, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
+			walk_towards(parentmob, atomtowalkto, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
 
 //We reached to one of the nodes on the way to destination node, if it is destination node lets get a new destination
-/datum/ai_behavior/proc/NextNodeReached()
-	current_node = next_node
-	if(next_node == destination_node)
-		GetRandomDestination()
-	next_node = pick(current_node.datumnode.adjacent_nodes)
+/datum/ai_behavior/proc/TargetReached()
+	if(istype(atomtowalkto, /obj/effect/AINode))
+		current_node = atomtowalkto
+	//if(atomtowalkto == destination_node)
+	//	GetRandomDestination()
+	atomtowalkto = pick(current_node.datumnode.adjacent_nodes)
 	/*
 	next_node.color = initial(next_node.color)
 	var/possiblenode = get_node_towards(current_node, destination_node)
@@ -65,18 +69,11 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 //Comes with the turf of the tile it's going to
 /datum/ai_behavior/proc/HandleObstruction() //If HandleMovement fails, do some HandleObstruction()
 	//In this case, we switch to intelligent pathfinding to move around the obstacle until HandleMovement() gets called again
-	walk_to(parentmob, next_node, 0, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
-
-/datum/ai_behavior/proc/GetRandomDestination() //Gets a new random destination that isn't it's current node
-	destination_node = pick(GLOB.allnodes)
-	while(destination_node == current_node) //Insurence
-		destination_node = pick(GLOB.allnodes)
-	//destination_node.color = "#FF69B4"
+	walk_to(parentmob, atomtowalkto, 0, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
 
 //Basic datum AI for a xeno; ability to use acid on obstacles if valid as well as attack obstacles
 
 /datum/ai_behavior/xeno
-	parentmob = new/mob/living/carbon/xenomorph()
 	//mob/living/carbon/Xenomorph/parentmob //Retypecast
 
 /datum/ai_behavior/xeno/Init()
@@ -91,11 +88,28 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 /datum/ai_behavior/xeno/proc/HandleAbility()
 
 /datum/ai_behavior/xeno/HandleObstruction()
-	walk_to(parentmob, next_node, 0, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
-	if(world.time >= parentmob.next_move) //If we can attack again or not
+	var/mob/living/carbon/xenomorph/parentmob2 = parentmob
+	walk_to(parentmob2, atomtowalkto, 0, parentmob2.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
+
+	for(var/obj/machinery/door/airlock/door in range(1, parentmob))
+		if(door.density && !door.welded)
+			door.open()
+
+	for(var/turf/closed/probawall in range(1, parentmob))
+		if(probawall.current_acid)
+			return
+		if(!probawall.acid_check(/obj/effect/xenomorph/acid/strong))
+			var/obj/effect/xenomorph/acid/strong/newacid = new /obj/effect/xenomorph/acid/strong(get_turf(probawall), probawall)
+			newacid.icon_state += "_wall"
+			newacid.acid_strength = 0.1 //Very fast acid
+			probawall.current_acid = newacid
+
+	if(parentmob2.next_move < world.time) //If we can attack again or not
 		for(var/obj/structure/struct in range(1, parentmob))
 			struct.attack_alien(parentmob)
-			parentmob.next_move = parentmob.xeno_caste.attack_delay
-	for(var/obj/machinery/door/airlock/door in range(1, parentmob))
-		if(!door.density)
-			door.open()
+			parentmob2.next_move = parentmob2.xeno_caste.attack_delay
+			return
+		for(var/obj/machinery/machin in range(1, parentmob))
+			machin.attack_alien(parentmob)
+			parentmob2.next_move = parentmob2.xeno_caste.attack_delay
+			return
