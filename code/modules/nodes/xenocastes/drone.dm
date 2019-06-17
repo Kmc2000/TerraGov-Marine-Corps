@@ -19,6 +19,7 @@
 
 //We make magic weeds
 /datum/ai_behavior/xeno/drone/HandleAbility()
+	..()
 	var/mob/living/carbon/xenomorph/drone/parentmob2 = parentmob
 	var/turf/T = get_turf(parentmob2)
 

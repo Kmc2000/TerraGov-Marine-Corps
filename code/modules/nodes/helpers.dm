@@ -18,10 +18,17 @@
 		return possiblenodes[2]
 	return null
 
+//Returns a list of humans via get_dist and same z level method, very cheap compared to range()
+/proc/cheap_get_humans_near(var/source, var/distance)
+	var/list/listofhuman = list() //All humans in range
+	for(var/human in GLOB.alive_human_list)
+		if(get_dist(source, human) <= distance)
+			listofhuman += human
+	return listofhuman
+
+
 /datum/ai_behavior/proc/GetRandomDestination() //Gets a new random destination that isn't it's current node
 	destination_node = pick(GLOB.allnodes)
 	while(destination_node == current_node) //Insurence
 		destination_node = pick(GLOB.allnodes)
 	//destination_node.color = "#FF69B4"
-
-/proc/

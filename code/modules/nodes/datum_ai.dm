@@ -86,6 +86,10 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 		HandleAbility()
 
 /datum/ai_behavior/xeno/proc/HandleAbility()
+	var/list/somehumans = cheap_get_humans_near(parentmob, 14) //7 or less distance required to find a human
+	for(var/human in somehumans)
+		atomtowalkto = human
+		break
 
 /datum/ai_behavior/xeno/HandleObstruction()
 	var/mob/living/carbon/xenomorph/parentmob2 = parentmob
