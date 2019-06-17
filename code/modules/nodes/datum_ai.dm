@@ -13,10 +13,12 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 	//var/obj/effect/AINode/next_node
 	var/atom/atomtowalkto //What thing we should be moving towards
 	var/obj/effect/AINode/destination_node
+	var/move_delay = 0 //The next world.time we can do a move at
 
 /datum/ai_behavior/New()
 	..()
 	SSai.aidatums += src
+	SSai_movement.toprocess += src
 
 /datum/ai_behavior/proc/Init() //Bandaid solution for initializing things
 	for(var/obj/effect/AINode/node in range(4))
@@ -31,11 +33,13 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 		qdel(src)
 
 /datum/ai_behavior/proc/Process() //Processes and updates things
-	HandleMovement()
+	if(get_dist(parentmob, atomtowalkto) < 2)
+		TargetReached()
 	lastturf = parentmob.loc
 
 //We do some moving to a destination
-/datum/ai_behavior/proc/HandleMovement()
+/*
+/datum/ai_behavior/proc/ProcessMove()
 	if(get_dist(parentmob, atomtowalkto) < 2)
 		TargetReached()
 	else
@@ -43,6 +47,7 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 			HandleObstruction()
 		else //Should be alright going with dumb AI
 			walk_towards(parentmob, atomtowalkto, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
+*/
 
 //We reached to one of the nodes on the way to destination node, if it is destination node lets get a new destination
 /datum/ai_behavior/proc/TargetReached()
@@ -69,7 +74,7 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 //Comes with the turf of the tile it's going to
 /datum/ai_behavior/proc/HandleObstruction() //If HandleMovement fails, do some HandleObstruction()
 	//In this case, we switch to intelligent pathfinding to move around the obstacle until HandleMovement() gets called again
-	walk_to(parentmob, atomtowalkto, 0, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
+	//walk_to(parentmob, atomtowalkto, 0, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
 
 //Basic datum AI for a xeno; ability to use acid on obstacles if valid as well as attack obstacles
 
@@ -93,7 +98,7 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 
 /datum/ai_behavior/xeno/HandleObstruction()
 	var/mob/living/carbon/xenomorph/parentmob2 = parentmob
-	walk_to(parentmob2, atomtowalkto, 0, parentmob2.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
+	//walk_to(parentmob2, atomtowalkto, 0, parentmob2.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
 
 	for(var/obj/machinery/door/airlock/door in range(1, parentmob))
 		if(door.density && !door.welded)
@@ -108,12 +113,17 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 			newacid.acid_strength = 0.1 //Very fast acid
 			probawall.current_acid = newacid
 
+	for(var/obj/machinery/machin in range(1, parentmob))
+		if(probawall.current_acid)
+			return
+		if(!probawall.acid_check(/obj/effect/xenomorph/acid/strong))
+			var/obj/effect/xenomorph/acid/strong/newacid = new /obj/effect/xenomorph/acid/strong(get_turf(probawall), probawall)
+			newacid.icon_state += "_wall"
+			newacid.acid_strength = 0.1 //Very fast acid
+			probawall.current_acid = newacid
+
 	if(parentmob2.next_move < world.time) //If we can attack again or not
 		for(var/obj/structure/struct in range(1, parentmob))
 			struct.attack_alien(parentmob)
-			parentmob2.next_move = parentmob2.xeno_caste.attack_delay
-			return
-		for(var/obj/machinery/machin in range(1, parentmob))
-			machin.attack_alien(parentmob)
-			parentmob2.next_move = parentmob2.xeno_caste.attack_delay
+			parentmob2.next_move = parentmob2.xeno_caste.attack_delay + world.time
 			return
