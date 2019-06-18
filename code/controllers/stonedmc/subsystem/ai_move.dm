@@ -43,21 +43,18 @@ SUBSYSTEM_DEF(ai_movement)
 			totalmovedelay += 7 + CONFIG_GET(number/movedelay/walk_delay)
 	totalmovedelay += parentmob.movement_delay()
 
-	var/turf/directiontomove = get_dir(parentmob, get_step_towards(parentmob, atomtowalkto)) //We cache the direction so we can adjust move delay on things like diagonal move alongside other things
-	if(!step(parentmob, directiontomove)) //Didn't work, let's try the smarter pathfinder
-		var/turf/smarterdirection = get_dir(parentmob, get_step_to(parentmob, atomtowalkto))
-		if(!step(parentmob, smarterdirection)) //If this doesn't work, we're stuck
-			HandleObstruction()
-			return
-		else
-			if(smarterdirection in GLOB.diagonals)
-				move_delay = world.time + (totalmovedelay * SQRTWO)
-			else
-				move_delay = totalmovedelay + world.time
-			return
-	else
-		if(directiontomove in GLOB.diagonals)
-			move_delay = world.time + (totalmovedelay * SQRTWO)
-		else
-			move_delay = totalmovedelay + world.time
+	var/doubledelay = FALSE //If we add on additional delay due to it being a diagonal move
+	//var/turf/directiontomove = get_dir(parentmob, get_step_towards(parentmob, atomtowalkto)) //We cache the direction so we can adjust move delay on things like diagonal move alongside other things
+	var/turf/smarterdirection = get_step_to(parentmob, atomtowalkto)
+	if(!parentmob.Move(smarterdirection)) //If this doesn't work, we're stuck
+		HandleObstruction()
+		move_delay = world.time + 2 //Let's try again shortly:tm:
 		return
+
+	if(smarterdirection in GLOB.diagonals)
+		doubledelay = TRUE
+
+	if(doubledelay)
+		move_delay = world.time + (totalmovedelay * SQRTWO)
+	else
+		move_delay = world.time + totalmovedelay

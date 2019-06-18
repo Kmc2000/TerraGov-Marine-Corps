@@ -91,7 +91,7 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 		HandleAbility()
 
 /datum/ai_behavior/xeno/proc/HandleAbility()
-	var/list/somehumans = cheap_get_humans_near(parentmob, 14) //7 or less distance required to find a human
+	var/list/somehumans = cheap_get_humans_near(parentmob, 14) //14 or less distance required to find a human
 	for(var/human in somehumans)
 		atomtowalkto = human
 		break
@@ -113,17 +113,13 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 			newacid.acid_strength = 0.1 //Very fast acid
 			probawall.current_acid = newacid
 
-	for(var/obj/machinery/machin in range(1, parentmob))
-		if(probawall.current_acid)
-			return
-		if(!probawall.acid_check(/obj/effect/xenomorph/acid/strong))
-			var/obj/effect/xenomorph/acid/strong/newacid = new /obj/effect/xenomorph/acid/strong(get_turf(probawall), probawall)
-			newacid.icon_state += "_wall"
-			newacid.acid_strength = 0.1 //Very fast acid
-			probawall.current_acid = newacid
 
 	if(parentmob2.next_move < world.time) //If we can attack again or not
 		for(var/obj/structure/struct in range(1, parentmob))
-			struct.attack_alien(parentmob)
-			parentmob2.next_move = parentmob2.xeno_caste.attack_delay + world.time
-			return
+			if(struct.attack_alien(parentmob))
+				parentmob2.next_move = parentmob2.xeno_caste.attack_delay + world.time
+				return
+		for(var/obj/machinery/machin in range(1, parentmob))
+			if(machin.attack_alien(parentmob))
+				parentmob2.next_move = parentmob2.xeno_caste.attack_delay + world.time
+				return
