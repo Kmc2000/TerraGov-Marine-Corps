@@ -6,6 +6,14 @@
 	ai_datum.parentmob = src
 	ai_datum.Init()
 
+/mob/living/carbon/xenomorph/runner/ancient/ai
+	var/datum/ai_behavior/xeno/drone/ai_datum = new
+
+/mob/living/carbon/xenomorph/runner/ancient/ai/Initialize()
+	..()
+	ai_datum.parentmob = src
+	ai_datum.Init()
+
 //An AI datum for drones; it makes weeds and pheromones
 
 /datum/ai_behavior/xeno/drone

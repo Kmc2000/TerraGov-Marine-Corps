@@ -87,8 +87,22 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 
 /datum/ai_behavior/xeno/Process()
 	..()
-	if(prob(25))
+	if(prob(10))
 		HandleAbility()
+
+//If it's a human we slap it, otherwise continue the random node traveling
+/datum/ai_behavior/xeno/TargetReached()
+	if(istype(atomtowalkto, /obj/effect/AINode))
+		current_node = atomtowalkto
+	if(istype(atomtowalkto, /mob/living/carbon/human))
+		var/mob/living/carbon/human/dammhuman = atomtowalkto
+		if(dammhuman.stat != DEAD)
+			var/mob/living/carbon/xenomorph/parentmob2 = parentmob
+			if(parentmob2.next_move < world.time)
+				atomtowalkto.attack_alien(parentmob2)
+				parentmob2.next_move = parentmob2.xeno_caste.attack_delay + world.time
+		else
+			..() //We go to a random node now
 
 /datum/ai_behavior/xeno/proc/HandleAbility()
 	var/list/somehumans = cheap_get_humans_near(parentmob, 14) //14 or less distance required to find a human
