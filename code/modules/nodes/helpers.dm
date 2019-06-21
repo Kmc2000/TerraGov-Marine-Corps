@@ -31,4 +31,25 @@
 	destination_node = pick(GLOB.allnodes)
 	while(destination_node == current_node) //Insurence
 		destination_node = pick(GLOB.allnodes)
-	//destination_node.color = "#FF69B4"
+
+/proc/LeftAndRightOfDir(direction) //Returns the left and right dir of the input dir, used for AI stutter step and cade movement
+	var/list/somedirs = list()
+	switch(direction)
+		if(NORTH)
+			somedirs = list(WEST, EAST)
+		if(SOUTH)
+			somedirs = list(EAST, WEST)
+		if(WEST)
+			somedirs = list(SOUTH, NORTH)
+		if(EAST)
+			somedirs = list(NORTH, SOUTH)
+		if(NORTHEAST)
+			somedirs = list(NORTH, EAST)
+		if(NORTHWEST)
+			somedirs = list(NORTH, WEST)
+		if(SOUTHEAST)
+			somedirs = list(SOUTH, EAST)
+		if(SOUTHWEST)
+			somedirs = list(SOUTH, WEST)
+
+	return(somedirs)

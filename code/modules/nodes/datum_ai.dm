@@ -10,7 +10,6 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 	var/turf/destinationturf //Turf that we want to get to
 	var/turf/lastturf //If this is the same as parentmob turf at HandleMovement() then we made no progress in moving, do HandleObstruction from there
 	var/obj/effect/AINode/current_node //Current node the parentmob is at
-	//var/obj/effect/AINode/next_node
 	var/atom/atomtowalkto //What thing we should be moving towards
 	var/obj/effect/AINode/destination_node
 	var/move_delay = 0 //The next world.time we can do a move at
@@ -25,70 +24,43 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 		if(node)
 			current_node = node
 			parentmob.forceMove(current_node.loc)
-			//GetRandomDestination()
 			atomtowalkto = pick(current_node.datumnode.adjacent_nodes) //get_node_towards(current_node, destination_node)
-			//next_node.color = "#FF6900" //Orange
 		break
 	if(!current_node)
 		qdel(src)
 
 /datum/ai_behavior/proc/Process() //Processes and updates things
+	if(!atomtowalkto)
+		atomtowalkto = pick(current_node.datumnode.adjacent_nodes)
 	if(get_dist(parentmob, atomtowalkto) < 2)
 		TargetReached()
+	if(get_dist(parentmob, atomtowalkto) > 14)
+		atomtowalkto = pick(current_node.datumnode.adjacent_nodes)
 	lastturf = parentmob.loc
-
-//We do some moving to a destination
-/*
-/datum/ai_behavior/proc/ProcessMove()
-	if(get_dist(parentmob, atomtowalkto) < 2)
-		TargetReached()
-	else
-		if(parentmob.loc == lastturf) //No change in turfs since last AI process update, switch to more intelligent pathfinding for a bit
-			HandleObstruction()
-		else //Should be alright going with dumb AI
-			walk_towards(parentmob, atomtowalkto, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
-*/
 
 //We reached to one of the nodes on the way to destination node, if it is destination node lets get a new destination
 /datum/ai_behavior/proc/TargetReached()
 	if(istype(atomtowalkto, /obj/effect/AINode))
 		current_node = atomtowalkto
-	//if(atomtowalkto == destination_node)
-	//	GetRandomDestination()
 	atomtowalkto = pick(current_node.datumnode.adjacent_nodes)
-	/*
-	next_node.color = initial(next_node.color)
-	var/possiblenode = get_node_towards(current_node, destination_node)
-	if(possiblenode)
-		next_node = possiblenode
-		next_node.color = "#FF6900"
-	else
-		next_node = pick(current_node.datumnode.adjacent_nodes)
-		next_node.color = "#FF6900"
-	*/
-
 
 /datum/ai_behavior/proc/DestinationReached() //We reached our destination, let's go to another adjacent node
 	GetRandomDestination()
 
 //Comes with the turf of the tile it's going to
 /datum/ai_behavior/proc/HandleObstruction() //If HandleMovement fails, do some HandleObstruction()
-	//In this case, we switch to intelligent pathfinding to move around the obstacle until HandleMovement() gets called again
-	//walk_to(parentmob, atomtowalkto, 0, parentmob.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
 
 //Basic datum AI for a xeno; ability to use acid on obstacles if valid as well as attack obstacles
-
 /datum/ai_behavior/xeno
-	//mob/living/carbon/Xenomorph/parentmob //Retypecast
 
 /datum/ai_behavior/xeno/Init()
 	..()
 	parentmob.a_intent = INTENT_HARM
 
+//Below proc happens everyone one second
 /datum/ai_behavior/xeno/Process()
 	..()
-	if(prob(10))
-		HandleAbility()
+	HandleAbility()
 
 //If it's a human we slap it, otherwise continue the random node traveling
 /datum/ai_behavior/xeno/TargetReached()
@@ -112,7 +84,6 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 
 /datum/ai_behavior/xeno/HandleObstruction()
 	var/mob/living/carbon/xenomorph/parentmob2 = parentmob
-	//walk_to(parentmob2, atomtowalkto, 0, parentmob2.movement_delay() + (2 + CONFIG_GET(number/movedelay/run_delay)))
 
 	for(var/obj/machinery/door/airlock/door in range(1, parentmob))
 		if(door.density && !door.welded)
@@ -126,7 +97,6 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 			newacid.icon_state += "_wall"
 			newacid.acid_strength = 0.1 //Very fast acid
 			probawall.current_acid = newacid
-
 
 	if(parentmob2.next_move < world.time) //If we can attack again or not
 		for(var/obj/structure/struct in range(1, parentmob))

@@ -6,28 +6,22 @@
 	ai_datum.parentmob = src
 	ai_datum.Init()
 
-/mob/living/carbon/xenomorph/runner/ancient/ai
-	var/datum/ai_behavior/xeno/drone/ai_datum = new
-
-/mob/living/carbon/xenomorph/runner/ancient/ai/Initialize()
-	..()
-	ai_datum.parentmob = src
-	ai_datum.Init()
-
 //An AI datum for drones; it makes weeds and pheromones
 
 /datum/ai_behavior/xeno/drone
-	//parentmob = new/mob/living/carbon/Xenomorph/Drone()
-	//mob/living/carbon/Xenomorph/Drone/parentmob //Retypecast
+	var/datum/action/xeno_action/plant_weeds/plantweeds = new
 
 /datum/ai_behavior/xeno/drone/Init()
 	..()
 	var/mob/living/carbon/xenomorph/drone/parentmob2 = parentmob
 	parentmob2.current_aura = pick(list("recovery", "warding", "frenzy"))
+	plantweeds.owner = parentmob2
 
 //We make magic weeds
 /datum/ai_behavior/xeno/drone/HandleAbility()
 	..()
+	plantweeds.action_activate()
+	/*
 	var/mob/living/carbon/xenomorph/drone/parentmob2 = parentmob
 	var/turf/T = get_turf(parentmob2)
 
@@ -44,3 +38,4 @@
 	playsound(parentmob2.loc, "alien_resin_build", 25)
 	round_statistics.weeds_planted++
 	return
+	*/
