@@ -69,7 +69,9 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 		var/list/humans_nearby = cheap_get_humans_near(parentmob, 14) //14 or less distance required to find a human	//While we're here let's update the amount of enemies here
 		current_node.datumnode.set_weight(ENEMY_PRESENCE, humans_nearby.len)
 		if(current_node.datumnode.weight_not_null(ENEMY_PRESENCE)) //If it turns out that it had enemies, we should make sure it's in a list of notable nodes
-			current_node.add_to_notable_nodes(ENEMY_PRESENT)
+			current_node.add_to_notable_nodes(ENEMY_PRESENCE)
+		else
+			current_node.remove_from_notable_nodes(ENEMY_PRESENCE)
 
 	if(istype(atomtowalkto, /mob/living/carbon/human))
 		var/mob/living/carbon/human/dammhuman = atomtowalkto
