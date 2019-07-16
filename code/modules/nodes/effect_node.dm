@@ -36,6 +36,7 @@ GLOBAL_LIST_EMPTY(nodes_with_enemies)
 			if(src in GLOB.nodes_with_enemies)
 				return
 			GLOB.nodes_with_enemies.Add(src)
+			color = "#FFA500" //Orange: got some enemies here
 
 /obj/effect/AINode/proc/remove_from_notable_nodes(weight)
 	switch(weight)

@@ -3,6 +3,9 @@ Datums that represent an AI mind and it's way of doing various things like movem
 Base datums for stuff like humans or xenos have possible actions to do as well as attitudes
 */
 
+#define ENEMY_PRESENCE 1
+#define DANGER_SCALE 2
+
 //The most basic of AI; can pathfind to a turf and path around objects in it's path if needed to
 /datum/ai_behavior
 
@@ -52,14 +55,24 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 
 //Basic datum AI for a xeno; ability to use acid on obstacles if valid as well as attack obstacles
 /datum/ai_behavior/xeno
+	var/last_health //For purposes of sensing overall danger at this node
 
 /datum/ai_behavior/xeno/Init()
 	..()
 	parentmob.a_intent = INTENT_HARM
+	last_health = parentmob.health
 
 //Below proc happens everyone one second
 /datum/ai_behavior/xeno/Process()
 	..()
+	if(parentmob.health < last_health)
+		if(get_dist(parentmob, current_node) > get_dist(parentmob, destination_node)) //See what's closer
+			destination_node.datumnode.increment_weight(DANGER_SCALE, last_health - parentmob.health)
+			current_node.color = "#ff0000" //Red, we got hurt
+		else
+			current_node.datumnode.increment_weight(DANGER_SCALE, last_health - parentmob.health)
+			current_node.color = "#ff0000" //Red, we got hurt
+	last_health = parentmob.health
 	HandleAbility()
 
 //If it's a human we slap it, otherwise continue the random node traveling
@@ -72,6 +85,12 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 			current_node.add_to_notable_nodes(ENEMY_PRESENCE)
 		else
 			current_node.remove_from_notable_nodes(ENEMY_PRESENCE)
+		for(var/obj/effect/AINode/node in shuffle(current_node.datumnode.adjacent_nodes))
+			if(node.datumnode.get_weight(DANGER_SCALE) > 0)
+				return
+			else
+				atomtowalkto = node
+				break
 
 	if(istype(atomtowalkto, /mob/living/carbon/human))
 		var/mob/living/carbon/human/dammhuman = atomtowalkto
@@ -84,10 +103,10 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 			..() //We go to a random node now
 
 /datum/ai_behavior/xeno/proc/HandleAbility()
-	var/list/somehumans = cheap_get_humans_near(parentmob, 14) //14 or less distance required to find a human
-	for(var/human in somehumans)
-		atomtowalkto = human
-		break
+	//var/list/somehumans = cheap_get_humans_near(parentmob, 14) //14 or less distance required to find a human
+	//for(var/human in somehumans)
+	//	atomtowalkto = human
+	//	break
 
 /datum/ai_behavior/xeno/HandleObstruction()
 	var/mob/living/carbon/xenomorph/parentmob2 = parentmob
