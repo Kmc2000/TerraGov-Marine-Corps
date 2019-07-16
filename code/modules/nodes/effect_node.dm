@@ -1,3 +1,5 @@
+GLOBAL_LIST_EMPTY(nodes_with_enemies)
+
 //The actual node; really only to hold the ai_node datum that stores all the information
 
 /obj/effect/AINode //A effect that has a ai_node datum in it, used by AIs to pathfind over long distances as well as knowing what's happening at it
@@ -27,6 +29,18 @@
 			if(!IsDense)
 			*/
 			datumnode.adjacent_nodes += node
+
+/obj/effect/AINode/proc/add_to_notable_nodes(weight)
+	switch(weight)
+		if(ENEMY_PRESENCE)
+			if(src in GLOB.nodes_with_enemies)
+				return
+			GLOB.nodes_with_enemies.Add(src)
+
+/obj/effect/AINode/proc/remove_from_notable_nodes(weight)
+	switch(weight)
+		if(ENEMY_PRESENCE)
+			GLOB.nodes_with_enemies.Remove(src)
 
 /obj/effect/AINode/debug //A debug version of the AINode; makes it visible to allow for easy var editing
 
