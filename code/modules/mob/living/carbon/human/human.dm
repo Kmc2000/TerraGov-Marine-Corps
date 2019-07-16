@@ -5,7 +5,7 @@
 	real_name = "unknown"
 	icon = 'icons/mob/human.dmi'
 	icon_state = "body_m_s"
-	hud_possible = list(HEALTH_HUD,STATUS_HUD, XENO_EMBRYO_HUD,ID_HUD,WANTED_HUD,IMPLOYAL_HUD,IMPCHEM_HUD,IMPTRACK_HUD, SPECIALROLE_HUD, SQUAD_HUD, ORDER_HUD, PAIN_HUD)
+	hud_possible = list(HEALTH_HUD, STATUS_HUD_SIMPLE, STATUS_HUD, XENO_EMBRYO_HUD,ID_HUD,WANTED_HUD,IMPLOYAL_HUD,IMPCHEM_HUD,IMPTRACK_HUD, SPECIALROLE_HUD, SQUAD_HUD, ORDER_HUD, PAIN_HUD)
 	var/embedded_flag	  //To check if we've need to roll for damage on movement while an item is imbedded in us.
 
 
@@ -25,7 +25,7 @@
 
 	GLOB.human_mob_list += src
 	GLOB.alive_human_list += src
-	round_statistics.total_humans_created++
+	GLOB.round_statistics.total_humans_created++
 
 	var/datum/action/skill/toggle_orders/toggle_orders_action = new
 	toggle_orders_action.give_action(src)
@@ -66,13 +66,14 @@
 	hud_set_order()
 	//and display them
 	add_to_all_mob_huds()
+	
+	var/datum/atom_hud/hud_to_add = GLOB.huds[DATA_HUD_BASIC]
+	hud_to_add.add_hud_to(src)
 
 
 
 /mob/living/carbon/human/Destroy()
-	if(assigned_squad)
-		SSdirection.stop_tracking(assigned_squad.tracking_id, src) // failsafe to ensure they're definite not in the list
-	assigned_squad?.clean_marine_from_squad(src,FALSE)
+	assigned_squad?.clean_marine_from_squad(src, FALSE)
 	remove_from_all_mob_huds()
 	GLOB.human_mob_list -= src
 	GLOB.alive_human_list -= src
@@ -244,7 +245,7 @@
 
 // called when something steps onto a human
 // this handles mulebots and vehicles
-/mob/living/carbon/human/Crossed(var/atom/movable/AM)
+/mob/living/carbon/human/Crossed(atom/movable/AM)
 	if(istype(AM, /obj/machinery/bot/mulebot))
 		var/obj/machinery/bot/mulebot/MB = AM
 		MB.RunOver(src)
@@ -256,7 +257,7 @@
 
 //gets assignment from ID or ID inside PDA or PDA itself
 //Useful when player do something with computers
-/mob/living/carbon/human/proc/get_assignment(var/if_no_id = "No id", var/if_no_job = "No job")
+/mob/living/carbon/human/proc/get_assignment(if_no_id = "No id", if_no_job = "No job")
 	var/obj/item/card/id/id = wear_id
 	if (istype(id))
 		. = id.assignment
@@ -268,7 +269,7 @@
 
 //gets name from ID or ID inside PDA or PDA itself
 //Useful when player do something with computers
-/mob/living/carbon/human/proc/get_authentification_name(var/if_no_id = "Unknown")
+/mob/living/carbon/human/proc/get_authentification_name(if_no_id = "Unknown")
 	var/obj/item/card/id/id = wear_id
 	if (istype(id))
 		. = id.registered_name
@@ -307,7 +308,7 @@
 
 //gets name from ID or PDA itself, ID inside PDA doesn't matter
 //Useful when player is being seen by other mobs
-/mob/living/carbon/human/proc/get_id_name(var/if_no_id = "Unknown")
+/mob/living/carbon/human/proc/get_id_name(if_no_id = "Unknown")
 	. = if_no_id
 	if(wear_id)
 		var/obj/item/card/id/I = wear_id.GetID()
@@ -346,7 +347,7 @@
 
 //Removed the horrible safety parameter. It was only being used by ninja code anyways.
 //Now checks siemens_coefficient of the affected area by default
-/mob/living/carbon/human/electrocute_act(var/shock_damage, var/obj/source, var/base_siemens_coeff = 1.0, var/def_zone = null)
+/mob/living/carbon/human/electrocute_act(shock_damage, obj/source, base_siemens_coeff = 1.0, def_zone = null)
 	if(status_flags & GODMODE)	return 0	//godmode
 
 	if (!def_zone)
@@ -837,7 +838,7 @@
 	return number
 
 
-/mob/living/carbon/human/abiotic(var/full_body = 0)
+/mob/living/carbon/human/abiotic(full_body = 0)
 	if(full_body && ((src.l_hand && !( src.l_hand.flags_item & ITEM_ABSTRACT)) || (src.r_hand && !( src.r_hand.flags_item & ITEM_ABSTRACT)) || (src.back || src.wear_mask || src.head || src.shoes || src.w_uniform || src.wear_suit || src.glasses || src.wear_ear || src.gloves)))
 		return 1
 
@@ -881,7 +882,7 @@
 
 	//try to find the brain player in the decapitated head and put them back in control of the human
 	if(!client && !mind) //if another player took control of the human, we don't want to kick them out.
-		for (var/obj/item/limb/head/H in GLOB.item_list)
+		for (var/obj/item/limb/head/H in GLOB.head_list)
 			if(H.brainmob)
 				if(H.brainmob.real_name == src.real_name)
 					if(H.brainmob.mind)
@@ -908,7 +909,7 @@
 
 
 
-/mob/living/carbon/human/get_visible_implants(var/class = 0)
+/mob/living/carbon/human/get_visible_implants(class = 0)
 
 	var/list/visible_implants = list()
 	for(var/datum/limb/organ in limbs)
@@ -991,7 +992,7 @@
 	. = ..()
 	set_species(race)
 
-/mob/living/carbon/human/proc/set_species(var/new_species, var/default_colour)
+/mob/living/carbon/human/proc/set_species(new_species, default_colour)
 
 	if(!new_species)
 		new_species = "Human"
@@ -1069,9 +1070,6 @@
 	return ..()
 
 /mob/living/carbon/human/disable_lights(armor = TRUE, guns = TRUE, flares = TRUE, misc = TRUE, sparks = FALSE, silent = FALSE)
-	if(luminosity <= 0)
-		return FALSE
-
 	if(sparks)
 		var/datum/effect_system/spark_spread/spark_system = new
 		spark_system.set_up(5, 0, src)
@@ -1083,12 +1081,12 @@
 	if(armor)
 		if(istype(wear_suit, /obj/item/clothing/suit/storage/marine))
 			var/obj/item/clothing/suit/storage/marine/S = wear_suit
-			if(S.turn_off_light(src))
-				light_off++
+			S.set_light(0)
+			light_off++
 	if(guns)
 		for(var/obj/item/weapon/gun/G in contents)
-			if(G.turn_off_light(src))
-				light_off++
+			G.set_light(0)
+			light_off++
 	if(flares)
 		for(var/obj/item/flashlight/flare/F in contents)
 			if(F.on)
@@ -1100,8 +1098,8 @@
 			FL.turn_off(src)
 	if(misc)
 		for(var/obj/item/clothing/head/hardhat/H in contents)
-			if(H.turn_off_light(src))
-				light_off++
+			H.set_light(0)
+			light_off++
 		for(var/obj/item/flashlight/L in contents)
 			if(istype(L, /obj/item/flashlight/flare))
 				continue
@@ -1132,38 +1130,9 @@
 			if(light_off > 1)
 				to_chat(src, "<span class='notice'>Your sources of light short out.</span>")
 			else
-				to_chat(src, "<span class='notice'>Your source of light shorts out.</span>")
+				to_chat(src, "<span class='notice'>Your sources of light shorts out.</span>")
 		return TRUE
 
-
-/mob/living/carbon/human/update_sight()
-	if(!client)
-		return
-	if(stat == DEAD)
-		sight = (SEE_TURFS|SEE_MOBS|SEE_OBJS)
-		see_in_dark = 8
-		return
-
-	sight = initial(sight)
-	see_in_dark = species.darksight
-	see_invisible = SEE_INVISIBLE_LIVING
-
-	if(glasses)
-		var/obj/item/clothing/glasses/G = glasses
-		//prescription applies regardless of it the glasses are active
-		if(G.active)
-			see_in_dark = max(G.darkness_view, see_in_dark)
-			sight |= G.vision_flags
-			if(G.fullscreen_vision)
-				overlay_fullscreen("glasses_vision", G.fullscreen_vision)
-			else
-				clear_fullscreen("glasses_vision", 0)
-			if(G.see_invisible)
-				see_invisible = min(G.see_invisible, see_invisible)
-		else
-			clear_fullscreen("glasses_vision", 0)
-	else
-		clear_fullscreen("glasses_vision", 0)
 
 /mob/living/carbon/human/get_total_tint()
 	. = ..()
@@ -1319,28 +1288,7 @@
 	if(!J)
 		return FALSE
 
-	var/datum/outfit/job/O = new J.outfit
-	var/id = O.id ? O.id : /obj/item/card/id
-	var/obj/item/card/id/I = new id
-	var/datum/skills/L = new J.skills_type
-	mind.cm_skills = L
-	mind.comm_title = J.comm_title
-
-	if(wear_id)
-		qdel(wear_id)
-
-	job = rank
-	faction = J.faction
-
-	equip_to_slot_or_del(I, SLOT_WEAR_ID)
-
-	SSjob.AssignRole(src, rank)
-	O.handle_id(src)
-
-	GLOB.datacore.manifest_update(real_name, real_name, job)
-
-	if(assigned_squad)
-		change_squad(assigned_squad.name)
+	J.assign(src)
 
 	return TRUE
 
@@ -1374,7 +1322,8 @@
 /mob/living/carbon/human/take_over(mob/M)
 	. = ..()
 
-	set_rank(job)
+	var/datum/job/J = SSjob.GetJob(job)
+	J.equip(src)
 
 	if(assigned_squad)
 		change_squad(assigned_squad.name)

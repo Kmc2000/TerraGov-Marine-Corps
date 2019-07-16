@@ -32,7 +32,8 @@
 		if(GLOB.round_id)
 			stat("Round ID: [GLOB.round_id]")
 		stat("Operation Time: [worldtime2text()]")
-		stat("Current Map: [SSmapping.config?.map_name ? SSmapping.config.map_name : "Loading..."]")
+		stat("Current Map: [length(SSmapping.configs) ? SSmapping.configs[GROUND_MAP].map_name : "Loading..."]")
+		stat("Current Ship: [length(SSmapping.configs) ? SSmapping.configs[SHIP_MAP].map_name : "Loading..."]")
 		stat("Time Dilation: [round(SStime_track.time_dilation_current,1)]% AVG:([round(SStime_track.time_dilation_avg_fast,1)]%, [round(SStime_track.time_dilation_avg,1)]%, [round(SStime_track.time_dilation_avg_slow,1)]%)")
 
 
@@ -44,7 +45,6 @@
 				stat("World Time:", "[world.time]")
 				GLOB.stat_entry()
 				config.stat_entry()
-				lighting_controller.stat_entry()
 				stat(null)
 				if(Master)
 					Master.stat_entry()
@@ -90,7 +90,7 @@
 
 /mob/proc/prepare_huds()
 	hud_list = new
-	for(var/hud in hud_possible)
+	for(var/hud in hud_possible) //Providing huds.
 		hud_list[hud] = image('icons/mob/hud.dmi', src, "")
 
 
@@ -224,39 +224,36 @@
 //unset redraw_mob to prevent the mob from being redrawn at the end.
 /mob/proc/equip_to_slot_if_possible(obj/item/W, slot, ignore_delay = TRUE, del_on_fail = FALSE, warning = TRUE, redraw_mob = TRUE, permanent = FALSE)
 	if(!istype(W))
-		return
+		return FALSE
 	if(!W.mob_can_equip(src, slot, warning))
 		if(del_on_fail)
 			qdel(W)
-		else if(warning)
+			return FALSE
+		if(warning)
 			to_chat(src, "<span class='warning'>You are unable to equip that.</span>")
-		return
-	var/start_loc = W.loc
+		return FALSE
 	if(W.time_to_equip && !ignore_delay)
-		spawn(0)
-			if(!do_after(src, W.time_to_equip, TRUE, W, BUSY_ICON_FRIENDLY))
-				to_chat(src, "You stop putting on \the [W]")
-			else
-				equip_to_slot(W, slot, redraw_mob) //This proc should not ever fail.
-				if(permanent)
-					W.flags_item |= NODROP
-				if(W.loc == start_loc && get_active_held_item() != W)
-					//They moved it from hands to an inv slot or vice versa. This will unzoom and unwield items -without- triggering lights.
-					if(W.zoom)
-						W.zoom(src)
-					if(W.flags_item & TWOHANDED)
-						W.unwield(src)
+		if(!do_after(src, W.time_to_equip, TRUE, W, BUSY_ICON_FRIENDLY))
+			to_chat(src, "You stop putting on \the [W]")
+			return FALSE
+		equip_to_slot(W, slot, redraw_mob) //This proc should not ever fail.
+		if(permanent)
+			W.flags_item |= NODROP
+			//This will unzoom and unwield items -without- triggering lights.
+		if(W.zoom)
+			W.zoom(src)
+		if(CHECK_BITFIELD(W.flags_item, TWOHANDED))
+			W.unwield(src)
 		return TRUE
 	else
 		equip_to_slot(W, slot, redraw_mob) //This proc should not ever fail.
 		if(permanent)
 			W.flags_item |= NODROP
-		if(W.loc == start_loc && get_active_held_item() != W)
-			//They moved it from hands to an inv slot or vice versa. This will unzoom and unwield items -without- triggering lights.
-			if(W.zoom)
-				W.zoom(src)
-			if(W.flags_item & TWOHANDED)
-				W.unwield(src)
+		//This will unzoom and unwield items -without- triggering lights.
+		if(W.zoom)
+			W.zoom(src)
+		if(CHECK_BITFIELD(W.flags_item, TWOHANDED))
+			W.unwield(src)
 		return TRUE
 
 //This is an UNSAFE proc. It merely handles the actual job of equipping. All the checks on whether you can or can't eqip need to be done before! Use mob_can_equip() for that task.
@@ -539,7 +536,7 @@
 	return
 
 
-/mob/proc/facedir(var/ndir)
+/mob/proc/facedir(ndir)
 	if(!canface())
 		return FALSE
 	setDir(ndir)
@@ -568,7 +565,7 @@
 	overlay_fullscreen("pain", /obj/screen/fullscreen/pain, 1)
 	clear_fullscreen("pain")
 
-/mob/proc/get_visible_implants(var/class = 0)
+/mob/proc/get_visible_implants(class = 0)
 	var/list/visible_implants = list()
 	for(var/obj/item/O in embedded)
 		if(O.w_class > class)
@@ -680,10 +677,6 @@ mob/proc/yank_out_object()
 /mob/proc/slip(slip_source_name, stun_level, weaken_level, run_only, override_noslip, slide_steps)
 	return FALSE
 
-/mob/on_stored_atom_del(atom/movable/AM)
-	if(istype(AM, /obj/item))
-		temporarilyRemoveItemFromInventory(AM, TRUE) //unequip before deletion to clear possible item references on the mob.
-
 /mob/forceMove(atom/destination)
 	. = ..()
 	if(!.)
@@ -699,7 +692,7 @@ mob/proc/yank_out_object()
 	if(!pulling)
 		return forceMove(destination) //No need for a special proc if there's nothing being pulled.
 	pulledby?.stop_pulling() //The leader of the choo-choo train breaks the pull
-	var/atom/movable/list/conga_line[0]
+	var/list/conga_line = list()
 	var/end_of_conga = FALSE
 	var/mob/S = src
 	conga_line += S
@@ -783,6 +776,7 @@ mob/proc/yank_out_object()
 
 
 /mob/proc/add_emote_overlay(image/emote_overlay, remove_delay = TYPING_INDICATOR_LIFETIME)
+	emote_overlay.appearance_flags = APPEARANCE_UI_TRANSFORM
 	var/viewers = viewers()
 	for(var/mob/M in viewers)
 		if(!isobserver(M) && (M.stat != CONSCIOUS || isdeaf(M)))
@@ -894,4 +888,9 @@ mob/proc/yank_out_object()
 
 
 /mob/proc/sync_lighting_plane_alpha()
-	return
+	if(!hud_used)
+		return
+
+	var/obj/screen/plane_master/lighting/L = hud_used.plane_masters["[LIGHTING_PLANE]"]
+	if(L)
+		L.alpha = lighting_alpha

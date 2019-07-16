@@ -23,22 +23,24 @@
 	var/verb_exclaim = "exclaims"
 	var/verb_whisper = "whispers"
 	var/verb_yell = "yells"
+	var/speech_span
 
 	var/datum/component/orbiter/orbiting
 
 //===========================================================================
 /atom/movable/Destroy()
-	if(throw_source)
-		throw_source = null
-
-	loc?.on_stored_atom_del(src) //things that container need to do when a movable atom inside it is deleted
-
 	QDEL_NULL(proximity_monitor)
 	QDEL_NULL(language_holder)
 
+	if(throw_source)
+		throw_source = null
+
 	. = ..()
 
-	for(var/atom/movable/AM in contents)
+	loc?.handle_atom_del(src)
+
+	for(var/i in contents)
+		var/atom/movable/AM = i
 		qdel(AM)
 
 	moveToNullspace()
@@ -226,12 +228,6 @@
 
 /atom/movable/proc/Moved(atom/oldloc, direction, Forced = FALSE)
 	SEND_SIGNAL(src, COMSIG_MOVABLE_MOVED, oldloc, direction, Forced)
-	if(isturf(loc))
-		if(opacity)
-			oldloc.UpdateAffectingLights()
-		else if(light)
-			light.changed()
-
 	return TRUE
 
 
