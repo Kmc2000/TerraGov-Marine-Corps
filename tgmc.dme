@@ -151,7 +151,7 @@
 #include "code\controllers\stonedmc\master.dm"
 #include "code\controllers\stonedmc\subsystem.dm"
 #include "code\controllers\stonedmc\subsystem\ai.dm"
-#include "code\controllers\stonedmc\subsystem\ai_move.dm"
+#include "code\controllers\stonedmc\subsystem\ai_move_test.dm"
 #include "code\controllers\stonedmc\subsystem\air.dm"
 #include "code\controllers\stonedmc\subsystem\assets.dm"
 #include "code\controllers\stonedmc\subsystem\atoms.dm"

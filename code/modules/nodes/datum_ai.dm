@@ -16,11 +16,12 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 	var/atom/atomtowalkto //What thing we should be moving towards
 	var/obj/effect/AINode/destination_node
 	var/move_delay = 0 //The next world.time we can do a move at
+	var/last_move = 0 //The last world.time we did a mvoe at
 
 /datum/ai_behavior/New()
 	..()
 	SSai.aidatums += src
-	SSai_movement.toprocess += src
+	SSai_movement.list_of_lists[1] += src
 
 /datum/ai_behavior/proc/Init() //Bandaid solution for initializing things
 	for(var/obj/effect/AINode/node in range(4))
@@ -52,3 +53,34 @@ Base datums for stuff like humans or xenos have possible actions to do as well a
 
 //Comes with the turf of the tile it's going to
 /datum/ai_behavior/proc/HandleObstruction() //If HandleMovement fails, do some HandleObstruction()
+
+//Tile by tile movement electro boogaloo
+/datum/ai_behavior/proc/ProcessMove()
+
+	if(!parentmob.canmove)
+		return 2
+	var/totalmovedelay = 0
+	switch(parentmob.m_intent)
+		if(MOVE_INTENT_RUN)
+			totalmovedelay += 2 + CONFIG_GET(number/movedelay/run_delay)
+		if(MOVE_INTENT_WALK)
+			totalmovedelay += 7 + CONFIG_GET(number/movedelay/walk_delay)
+	totalmovedelay += parentmob.movement_delay()
+
+	var/doubledelay = FALSE //If we add on additional delay due to it being a diagonal move
+	//var/turf/directiontomove = get_dir(parentmob, get_step_towards(parentmob, atomtowalkto)) //We cache the direction so we can adjust move delay on things like diagonal move alongside other things
+	var/turf/smarterdirection = get_step_to(parentmob, atomtowalkto)
+	if(!parentmob.Move(smarterdirection)) //If this doesn't work, we're stuck
+		HandleObstruction()
+		move_delay = world.time + 2 //Let's try again shortly:tm:
+		return 2
+
+	if(smarterdirection in GLOB.diagonals)
+		doubledelay = TRUE
+
+	if(doubledelay)
+		move_delay = world.time + (totalmovedelay * SQRTWO)
+		return totalmovedelay * SQRTWO
+	else
+		move_delay = world.time + totalmovedelay
+		return totalmovedelay

@@ -97,7 +97,7 @@
 //Like the old one but now will do left and right movements upon being in melee range
 /datum/ai_behavior/xeno/ProcessMove()
 	if(!parentmob.canmove)
-		return
+		return 2
 	var/totalmovedelay = 0
 	switch(parentmob.m_intent)
 		if(MOVE_INTENT_RUN)
@@ -112,19 +112,23 @@
 		var/turf/smarterdirection = get_step_to(parentmob, atomtowalkto)
 		if(!parentmob.Move(smarterdirection)) //If this doesn't work, we're stuck
 			HandleObstruction()
-			move_delay = world.time + 2 //Let's try again shortly:tm:
-			return
+			//move_delay = world.time + 2 //Let's try again shortly:tm:
+			return 2
 
 		if(smarterdirection in GLOB.diagonals)
 			doubledelay = TRUE
 
 		if(doubledelay)
 			move_delay = world.time + (totalmovedelay * SQRTWO)
+			return totalmovedelay * SQRTWO
 		else
 			move_delay = world.time + totalmovedelay
+			return totalmovedelay
 
 	else //We're right at the target, let's do some left or right movement
 		if(prob(SSai.prob_sidestep_melee))
 			var/leftorright = pick(LeftAndRightOfDir(get_dir(parentmob, atomtowalkto)))
 			if(step(parentmob, leftorright))
 				move_delay = world.time + totalmovedelay
+				return totalmovedelay
+			return 2
