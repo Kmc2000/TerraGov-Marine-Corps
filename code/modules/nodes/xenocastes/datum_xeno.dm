@@ -7,6 +7,8 @@
 
 /datum/ai_behavior/xeno/Init()
 	..()
+	var/mob/living/carbon/xenomorph/parentmob2 = parentmob
+	parentmob2.xeno_caste.caste_flags += CASTE_INNATE_HEALING
 	parentmob.a_intent = INTENT_HARM
 	last_health = parentmob.health
 
@@ -21,6 +23,9 @@
 //Below proc happens everyone 1/2 second
 /datum/ai_behavior/xeno/Process()
 	..()
+
+	if(parentmob.resting && parentmob.canmove)
+		parentmob.set_resting(FALSE) //ARISE MY CHILDREN
 
 	var/list/humans_nearby = cheap_get_humans_near(parentmob, 10)
 	if(humans_nearby.len && !SSai.is_pacifist)
@@ -46,6 +51,16 @@
 		else
 			current_node.datumnode.increment_weight(DANGER_SCALE, last_health - parentmob.health)
 			current_node.color = "#ff0000" //Red, we got hurt
+
+	if(!SSai.is_suicidal && parentmob.health <= (SSai.retreat_health_threshold * parentmob.maxHealth))
+		var/obj/effect/AINode/retreat_to_node
+		for(var/obj/effect/AINode/node in current_node.datumnode.adjacent_nodes)
+			if(!retreat_to_node)
+				retreat_to_node = node
+			if(node.datumnode.get_weight(DANGER_SCALE) < retreat_to_node.datumnode.get_weight(DANGER_SCALE))
+				retreat_to_node = node
+		if(retreat_to_node)
+			atomtowalkto = retreat_to_node
 
 	last_health = parentmob.health
 	HandleAbility()
@@ -75,7 +90,7 @@
 						atomtowalkto = node
 						break
 
-	if(istype(atomtowalkto, /mob/living/carbon/human))
+	if(istype(atomtowalkto, /mob/living/carbon/human) && parentmob.canmove && (get_dist(parentmob, atomtowalkto) < 2))
 		var/mob/living/carbon/human/dammhuman = atomtowalkto
 		if(dammhuman.stat != DEAD)
 			var/mob/living/carbon/xenomorph/parentmob2 = parentmob

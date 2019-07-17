@@ -39,7 +39,6 @@ GLOBAL_LIST_EMPTY(nodes_with_enemies)
 			if(src in GLOB.nodes_with_enemies)
 				return
 			GLOB.nodes_with_enemies += src
-			to_chat(world, "added to nodes with enemies")
 			color = "#FFA500" //Orange: got some enemies here
 	for(var/stuff in GLOB.nodes_with_enemies)
 		to_chat(world, "[stuff]")

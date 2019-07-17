@@ -13,6 +13,10 @@ SUBSYSTEM_DEF(ai)
 
 	var/prioritize_nodes_with_enemies = FALSE //If xenos will beeline to nodes with seen enemies
 
+	var/is_suicidal = FALSE //If the AI will retreat or not when low on health
+
+	var/retreat_health_threshold = 0.50 //What percentage of health the xeno must be to do a retreat
+
 /datum/controller/subsystem/ai/fire(resume = FALSE)
 	if(!resume)
 		current_run = aidatums.Copy()
