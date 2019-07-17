@@ -19,7 +19,7 @@ GLOBAL_LIST_EMPTY(nodes_with_enemies)
 /obj/effect/AINode/proc/MakeAdjacents()
 	datumnode.adjacent_nodes = list()
 	for(var/obj/effect/AINode/node in GLOB.allnodes)
-		if(node && (node != src) && (get_dist(src, node) < 14) && (get_dir(src, node) in CARDINAL_DIRS))
+		if(node && (node != src) && (get_dist(src, node) < 16) && (get_dir(src, node) in CARDINAL_DIRS))
 			/*
 			var/list/turf/turfs = getline(src, node)
 			var/IsDense = FALSE

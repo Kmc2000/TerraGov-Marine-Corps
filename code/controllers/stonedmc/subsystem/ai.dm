@@ -2,10 +2,14 @@
 
 SUBSYSTEM_DEF(ai)
 	name = "AI Controller"
-	wait = 1
+	wait = 5
 	var/list/aidatums = list()
-	var/list/last_turf = list()
 	var/list/current_run
+
+	//Settings for the AI to obey
+	var/is_pacifist = FALSE //Will also ignore zones with any level of danger alongside no slashing
+
+	var/prob_sidestep_melee = 25 //Probability of a xeno side stepping while in melee every time its suppose to move
 
 /datum/controller/subsystem/ai/fire(resume = FALSE)
 	if(!resume)

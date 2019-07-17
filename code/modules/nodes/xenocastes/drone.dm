@@ -21,21 +21,3 @@
 /datum/ai_behavior/xeno/drone/HandleAbility()
 	..()
 	plantweeds.action_activate()
-	/*
-	var/mob/living/carbon/xenomorph/drone/parentmob2 = parentmob
-	var/turf/T = get_turf(parentmob2)
-
-	if(!T.is_weedable())
-		return
-
-	if(locate(/obj/effect/alien/weeds/node) in T)
-		return
-
-	parentmob2.visible_message("<span class='xenonotice'>\The [parentmob2] regurgitates a pulsating node and plants it on the ground!</span>", \
-		"<span class='xenonotice'>You regurgitate a pulsating node and plant it on the ground!</span>", null, 5)
-	new/obj/effect/alien/weeds/node(parentmob2.loc)
-	//var/obj/effect/alien/weeds/node/N = new (parentmob.loc, src, parentmob)
-	playsound(parentmob2.loc, "alien_resin_build", 25)
-	round_statistics.weeds_planted++
-	return
-	*/

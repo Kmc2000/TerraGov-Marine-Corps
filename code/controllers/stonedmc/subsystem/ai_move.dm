@@ -89,6 +89,7 @@ SUBSYSTEM_DEF(ai_movement)
 			move_delay = world.time + totalmovedelay
 
 	else //We're right at the target, let's do some left or right movement
-		var/leftorright = pick(LeftAndRightOfDir(get_dir(parentmob, atomtowalkto)))
-		if(step(parentmob, leftorright))
-			move_delay = world.time + totalmovedelay
+		if(prob(SSai.prob_sidestep_melee))
+			var/leftorright = pick(LeftAndRightOfDir(get_dir(parentmob, atomtowalkto)))
+			if(step(parentmob, leftorright))
+				move_delay = world.time + totalmovedelay
