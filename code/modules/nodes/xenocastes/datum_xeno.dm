@@ -16,12 +16,29 @@
 			if(human.stat != DEAD)
 				atomtowalkto = human
 				return TRUE
-
 	return FALSE
 
-//Below proc happens everyone one second
+//Below proc happens everyone 1/2 second
 /datum/ai_behavior/xeno/Process()
 	..()
+
+	var/list/humans_nearby = cheap_get_humans_near(parentmob, 10)
+	if(humans_nearby.len && !SSai.is_pacifist)
+		current_node.add_to_notable_nodes(ENEMY_PRESENCE)
+		current_node.color = "#FFA500"
+		AttemptGetTarget()
+
+	if(istype(atomtowalkto, /mob/living/carbon/human))
+		var/mob/living/carbon/human/the_human = atomtowalkto
+		if(the_human.stat == DEAD)
+			atomtowalkto = pick(shuffle(current_node.datumnode.adjacent_nodes))
+
+	if(istype(atomtowalkto, /obj/effect/AINode) && destination_node)
+		atomtowalkto = get_node_towards(current_node, destination_node)
+		if(!atomtowalkto)
+			destination_node = null
+			atomtowalkto = pick(shuffle(current_node.datumnode.adjacent_nodes))
+
 	if(parentmob.health < last_health)
 		if(get_dist(parentmob, current_node) > get_dist(parentmob, destination_node)) //See what's closer
 			destination_node.datumnode.increment_weight(DANGER_SCALE, last_health - parentmob.health)
@@ -29,6 +46,7 @@
 		else
 			current_node.datumnode.increment_weight(DANGER_SCALE, last_health - parentmob.health)
 			current_node.color = "#ff0000" //Red, we got hurt
+
 	last_health = parentmob.health
 	HandleAbility()
 
@@ -36,19 +54,26 @@
 /datum/ai_behavior/xeno/TargetReached()
 	if(istype(atomtowalkto, /obj/effect/AINode))
 		current_node = atomtowalkto
-		var/list/humans_nearby = cheap_get_humans_near(parentmob, 10) //14 or less distance required to find a human	//While we're here let's update the amount of enemies here
+		var/list/humans_nearby = cheap_get_humans_near(parentmob, 10) //10 or less distance required to find a human	//While we're here let's update the amount of enemies here
 		current_node.datumnode.set_weight(ENEMY_PRESENCE, humans_nearby.len)
 		if(humans_nearby.len && !SSai.is_pacifist)
+			current_node.add_to_notable_nodes(ENEMY_PRESENCE)
 			current_node.color = "#FFA500"
 			AttemptGetTarget()
 		else
+			current_node.remove_from_notable_nodes(ENEMY_PRESENCE) //No enemies here, reset it
+			if(current_node.color != "#ff0000") //If not dangerous, make it just be a normal node with no significance
+				current_node.color = initial(current_node.color)
 			current_node.color = initial(current_node.color)
-			for(var/obj/effect/AINode/node in shuffle(current_node.datumnode.adjacent_nodes))
-				if(SSai.is_pacifist && node.datumnode.get_weight(DANGER_SCALE) > 0)
-					return
-				else
-					atomtowalkto = node
-					break
+			if(SSai.prioritize_nodes_with_enemies && GLOB.nodes_with_enemies.len) //There's no enemies at this node but if they're somewhere else we moving to that
+				destination_node = pick(GLOB.nodes_with_enemies.len)
+			else //No nodes with enemies or not prioritizing, keep on moving randomly
+				for(var/obj/effect/AINode/node in shuffle(current_node.datumnode.adjacent_nodes))
+					if(SSai.is_pacifist && node.datumnode.get_weight(DANGER_SCALE) > 0)
+						return
+					else
+						atomtowalkto = node
+						break
 
 	if(istype(atomtowalkto, /mob/living/carbon/human))
 		var/mob/living/carbon/human/dammhuman = atomtowalkto
@@ -132,3 +157,6 @@
 				move_delay = world.time + totalmovedelay
 				return totalmovedelay
 			return 2
+
+/datum/ai_behavior/xeno/DestinationReached()
+	return

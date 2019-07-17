@@ -42,5 +42,4 @@ SUBSYSTEM_DEF(ai_movement)
 				next_index -= 100
 			if(next_index < 1)
 				next_index = 1
-			to_chat(world, "[next_index]")
 			list_of_lists[next_index] += ai

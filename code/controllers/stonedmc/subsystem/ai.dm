@@ -11,6 +11,8 @@ SUBSYSTEM_DEF(ai)
 
 	var/prob_sidestep_melee = 25 //Probability of a xeno side stepping while in melee every time its suppose to move
 
+	var/prioritize_nodes_with_enemies = FALSE //If xenos will beeline to nodes with seen enemies
+
 /datum/controller/subsystem/ai/fire(resume = FALSE)
 	if(!resume)
 		current_run = aidatums.Copy()
